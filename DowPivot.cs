@@ -299,19 +299,19 @@ namespace NinjaTrader.NinjaScript.Indicators
             // para "Up" ou "Down" e em todos os ticks com exce��o do primeiro tick
             if(!dp.IsFirstTickOfBar & lastTrend != TrendDir.Unknown)
             {
-                ArrayList tickLastLowCache =  new ArrayList(lastLowCache);
-                ArrayList tickLastHighCache = new ArrayList(lastHighCache);
+                ArrayList lastLowCacheTick =  new ArrayList(lastLowCache);
+                ArrayList lastHighCacheTick = new ArrayList(lastHighCache);
 
-                tickLastLowCache[tickLastLowCache.Count - 1] = dp.Low[0];
-                tickLastHighCache[tickLastHighCache.Count - 1] = dp.High[0];
+                lastLowCacheTick[lastLowCacheTick.Count - 1] = dp.Low[0];
+                lastHighCacheTick[lastHighCacheTick.Count - 1] = dp.High[0];
 
                 // Low calculations
-                bool tickIsSwingLow = true;
-                double tickSwingLowCandidateValue = (double)tickLastLowCache[strength];
+                bool isSwingLowTick = true;
+                double swingLowCandidateValueTick = (double)lastLowCacheTick[strength];
 
                 for (int i = 0; i < dp.Strength; i++)
-                    if (((double)lastLowCache[i]).ApproxCompare(tickSwingLowCandidateValue) <= 0)
-                        tickIsSwingLow = false;
+                    if (((double)lastLowCache[i]).ApproxCompare(swingLowCandidateValueTick) <= 0)
+                        isSwingLowTick = false;
 
             }
             // Enter only once per bar
