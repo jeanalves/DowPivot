@@ -264,10 +264,10 @@ namespace NinjaTrader.NinjaScript.Indicators
     public class SwingCalculation : ZigZagDP
     {
         #region Variables
-        private int strength;
-        private int constant;
-        private ArrayList lastLowCache;
-        private ArrayList lastHighCache;
+        private readonly int strength;
+        private readonly int constant;
+        private readonly ArrayList lastLowCache;
+        private readonly ArrayList lastHighCache;
         private bool isSwingLow;
         private bool isSwingHigh;
         private double swingLowCandidateValue;
@@ -279,7 +279,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         /// Constante usada para calculos feitos em "OnPriceChange" ou "OnEachTick"
         /// se n�o usada na atualiza��o dos valores podera causar certa discrepancia neles
         /// </summary>
-        private int barsAgoConstant = 1;
+        private const int barsAgoConstant = 1;
         #endregion
 
         public SwingCalculation(DowPivot dp) : base(dp)
@@ -486,8 +486,8 @@ namespace NinjaTrader.NinjaScript.Indicators
     public class PivotPointsLogic
 	{
         #region Variables
-        private PivotPoint low  = new PivotPoint();
-        private PivotPoint high = new PivotPoint();
+        private readonly PivotPoint low  = new PivotPoint();
+        private readonly PivotPoint high = new PivotPoint();
 
         private PivotPoint currentPP;
 
@@ -836,8 +836,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 
     public abstract class ZigZagDP : ZigZagBasicFunctions
     {
-        private List<HighLowPoint> lows;
-        private List<HighLowPoint> highs;
+        private readonly List<HighLowPoint> lows;
+        private readonly List<HighLowPoint> highs;
         private string lowTagName;
         private string highTagName;
 
