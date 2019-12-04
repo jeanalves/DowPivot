@@ -834,7 +834,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         }
     }
 
-    public abstract class ZigZagDP : ZigZagBasicFunctions
+    public abstract class ZigZagDP : IZigZagBasicFunctions
     {
         private readonly List<HighLowPoint> lows;
         private readonly List<HighLowPoint> highs;
@@ -932,7 +932,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         public abstract TrendDir GetCurrentHighLowLeg();
     }
 
-    public interface ZigZagBasicFunctions
+    public interface IZigZagBasicFunctions
     {
         void Calculate(DowPivot dp);
         TrendDir GetCurrentHighLowLeg();
