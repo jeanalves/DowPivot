@@ -768,6 +768,8 @@ namespace NinjaTrader.NinjaScript.Indicators
         {
             if (dp.ShowTargetAndStop)
             {
+                // Set where will be drawn the finish target line
+                const int endLine = -4;
                 switch (trendDir)
                 {
                     case TrendDir.Down:
@@ -779,7 +781,8 @@ namespace NinjaTrader.NinjaScript.Indicators
                         downTarget -= pp.high2.Price;
                         downTarget *= -1; // Inverte valor negativo para positivo
 
-                        Draw.Line(dp, dp.CurrentBar.ToString(), false, 0, downTarget, -4, downTarget, Brushes.Red, DashStyleHelper.Solid, 2);
+                        Draw.Line(dp, dp.CurrentBar.ToString(), false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, pp.low1.BarIndex), 
+                            downTarget, endLine, downTarget, Brushes.Red, DashStyleHelper.Solid, 2);
 
                         dp.ProfitTargetPriceSignal[0] = downTarget;
                         break;
@@ -791,7 +794,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 
                         upTarget += pp.low2.Price;
 
-                        Draw.Line(dp, dp.CurrentBar.ToString(), false, 0, upTarget, -4, upTarget, Brushes.Green, DashStyleHelper.Solid, 2);
+                        Draw.Line(dp, dp.CurrentBar.ToString(), false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, pp.high1.BarIndex), 
+                            upTarget, endLine, upTarget, Brushes.Green, DashStyleHelper.Solid, 2);
 
                         dp.ProfitTargetPriceSignal[0] = upTarget;
                         break;
