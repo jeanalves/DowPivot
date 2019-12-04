@@ -532,14 +532,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 
             isRising =      currentPP.low2.Price > currentPP.low1.Price &&
                             currentPP.high2.Price > currentPP.high1.Price;
-            
-            downFilter =    !IsOverMaxPercentPivotRetracement(dp, TrendDir.Down, currentPP) &&
-                            !IsOverMinPercentPivotRetracement(dp, TrendDir.Down, currentPP) /*&&
-                            !IsOverAveragePeriod(dp, currentPP, TrendDir.Down)*/;
+
+            downFilter = !IsOverMaxPercentPivotRetracement(dp, TrendDir.Down, currentPP) &&
+                            !IsOverMinPercentPivotRetracement(dp, TrendDir.Down, currentPP);
 
             upFilter =      !IsOverMaxPercentPivotRetracement(dp, TrendDir.Up, currentPP) &&
-                            !IsOverMinPercentPivotRetracement(dp, TrendDir.Up, currentPP)/* &&
-                            !IsOverAveragePeriod(dp, currentPP, TrendDir.Up)*/;
+                            !IsOverMinPercentPivotRetracement(dp, TrendDir.Up, currentPP);
 
             // Add low pivot
             if (isFalling && downFilter && zigZagDP.GetCurrentHighLowLeg() == TrendDir.Down && lastTrend != TrendDir.Down)
@@ -715,34 +713,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 
                     break;
             }
-            return false;
-        }
-        private bool IsOverAveragePeriod(DowPivot dp, PivotPoint pp, TrendDir trendDir)
-        {
-            switch(trendDir)
-            {
-                case TrendDir.Down:
-                    int downAveragePeriod = pp.high1.BarIndex - pp.high2.BarIndex < 0 ?
-                                            (pp.high1.BarIndex - pp.high2.BarIndex) * -1 :
-                                            pp.high1.BarIndex - pp.high2.BarIndex;
-
-                    if (dp.CurrentBar > (pp.high2.BarIndex + downAveragePeriod))
-                    {
-                        return true;
-                    }
-                        
-                    break;
-                case TrendDir.Up:
-                    int upAveragePeriod =   pp.low1.BarIndex - pp.low2.BarIndex < 0 ?
-                                            (pp.low1.BarIndex - pp.low2.BarIndex) * -1 :
-                                            pp.low1.BarIndex - pp.low2.BarIndex;
-
-                    if (dp.CurrentBar > (pp.low2.BarIndex + upAveragePeriod))
-                        return true;
-                    
-                    break;
-            }
-            
             return false;
         }
         private void SetPlotBuyOrSell(DowPivot dp, TrendDir trendDir)
