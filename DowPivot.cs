@@ -1,14 +1,14 @@
 #region Using declarations
+using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.Gui;
 using NinjaTrader.NinjaScript.DrawingTools;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Windows.Media;
 using System.Xml.Serialization;
-using System.Collections;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System;
-using NinjaTrader.Core.FloatingPoint;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -47,7 +47,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                     ShowTopBottomPoints = true,
                     ShowZigZag = true,
                     ZigZagWidth = 3,
-                    ZigZagColor = Brushes.White                    
+                    ZigZagColor = Brushes.White
                 };
 
                 // Pivot parameters
@@ -81,7 +81,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
             try
             {
-                switch(CalculationType)
+                switch (CalculationType)
                 {
                     case ZigZagCalculationType.Swing:
                         sc.Calculate(this);
@@ -91,7 +91,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                         pc.Calculate(this);
                         ppl.Calculate(this, pc);
                         break;
-                }       
+                }
             }
             catch (Exception e)
             {
@@ -180,7 +180,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
             // Third draw propertie
             [XmlIgnore]
-            [Display(Name ="Zig Zag width", Order = 2, GroupName = "1 Zig Zag parameters")]
+            [Display(Name = "Zig Zag width", Order = 2, GroupName = "1 Zig Zag parameters")]
             public int ZigZagWidth
             { get; set; }
             // Serializable from third draw propertie
@@ -199,7 +199,7 @@ namespace NinjaTrader.NinjaScript.Indicators
             // Serializable from fourth draw propertie
             [Browsable(false)]
             public string ZigZagColorSerializable
-            { 
+            {
                 get { return Serialize.BrushToString(ZigZagColor); }
                 set { ZigZagColor = Serialize.StringToBrush(value); }
             }
@@ -264,10 +264,10 @@ namespace NinjaTrader.NinjaScript.Indicators
     public class SwingCalculation : ZigZagDP
     {
         #region Variables
-        private int strength;
-        private int constant;
-        private ArrayList lastLowCache;
-        private ArrayList lastHighCache;
+        private readonly int strength;
+        private readonly int constant;
+        private readonly ArrayList lastLowCache;
+        private readonly ArrayList lastHighCache;
         private bool isSwingLow;
         private bool isSwingHigh;
         private double swingLowCandidateValue;
@@ -279,12 +279,12 @@ namespace NinjaTrader.NinjaScript.Indicators
         /// Constante usada para calculos feitos em "OnPriceChange" ou "OnEachTick"
         /// se n�o usada na atualiza��o dos valores podera causar certa discrepancia neles
         /// </summary>
-        private int barsAgoConstant = 1;
+        private const int barsAgoConstant = 1;
         #endregion
 
         public SwingCalculation(DowPivot dp) : base(dp)
         {
-            strength = (int) dp.Strength;
+            strength = (int)dp.Strength;
             constant = (strength * 2) + 1;
 
             lastLowCache = new ArrayList();
@@ -297,9 +297,9 @@ namespace NinjaTrader.NinjaScript.Indicators
         {
             // Este "if" � executado apenas quando lastTrend � iniciada alterando de "Unknow"
             // para "Up" ou "Down" e em todos os ticks com exce��o do primeiro tick
-            if(!dp.IsFirstTickOfBar & lastTrend != TrendDir.Unknown)
+            if (!dp.IsFirstTickOfBar & lastTrend != TrendDir.Unknown)
             {
-                ArrayList lastLowCacheTick =  new ArrayList(lastLowCache);
+                ArrayList lastLowCacheTick = new ArrayList(lastLowCache);
                 ArrayList lastHighCacheTick = new ArrayList(lastHighCache);
 
                 lastLowCacheTick[lastLowCacheTick.Count - 1] = dp.Low[0];
@@ -329,10 +329,10 @@ namespace NinjaTrader.NinjaScript.Indicators
                 if (lastLowCache.Count == constant)
                 {
                     isSwingLow = true;
-                    swingLowCandidateValue = (double) lastLowCache[strength];
+                    swingLowCandidateValue = (double)lastLowCache[strength];
 
                     for (int i = 0; i < dp.Strength; i++)
-                        if (((double) lastLowCache[i]).ApproxCompare(swingLowCandidateValue) <= 0)
+                        if (((double)lastLowCache[i]).ApproxCompare(swingLowCandidateValue) <= 0)
                             isSwingLow = false;
 
                     for (int i = Convert.ToInt32(dp.Strength) + 1; i < lastLowCache.Count; i++)
@@ -347,36 +347,36 @@ namespace NinjaTrader.NinjaScript.Indicators
                     swingHighCandidateValue = (double)lastHighCache[strength];
 
                     for (int i = 0; i < strength; i++)
-                        if (((double) lastHighCache[i]).ApproxCompare(swingHighCandidateValue) >= 0)
+                        if (((double)lastHighCache[i]).ApproxCompare(swingHighCandidateValue) >= 0)
                             isSwingHigh = false;
 
                     for (int i = strength + 1; i < lastHighCache.Count; i++)
                         if (((double)lastHighCache[i]).ApproxCompare(swingHighCandidateValue) > 0)
                             isSwingHigh = false;
                 }
-                
+
                 // Add low
-                if(isSwingLow && lastTrend != TrendDir.Down)
+                if (isSwingLow && lastTrend != TrendDir.Down)
                 {
                     AddLow(dp, swingLowCandidateValue, (dp.CurrentBar - strength) - barsAgoConstant);
                     lastLow = swingLowCandidateValue;
                     lastTrend = TrendDir.Down;
                 }
                 // Add high
-                if(isSwingHigh && lastTrend != TrendDir.Up)
+                if (isSwingHigh && lastTrend != TrendDir.Up)
                 {
                     AddHigh(dp, swingHighCandidateValue, (dp.CurrentBar - strength) - barsAgoConstant);
                     lastHigh = swingHighCandidateValue;
                     lastTrend = TrendDir.Up;
                 }
                 // Update low
-                if(isSwingLow && lastTrend == TrendDir.Down && swingLowCandidateValue < lastLow)
+                if (isSwingLow && lastTrend == TrendDir.Down && swingLowCandidateValue < lastLow)
                 {
                     UpdateLow(dp, swingLowCandidateValue, (dp.CurrentBar - strength) - barsAgoConstant);
                     lastLow = swingLowCandidateValue;
                 }
                 // Update high
-                if(isSwingHigh && lastTrend == TrendDir.Up && swingHighCandidateValue > lastHigh)
+                if (isSwingHigh && lastTrend == TrendDir.Up && swingHighCandidateValue > lastHigh)
                 {
                     UpdateHigh(dp, swingHighCandidateValue, (dp.CurrentBar - strength) - barsAgoConstant);
                     lastHigh = swingHighCandidateValue;
@@ -391,48 +391,48 @@ namespace NinjaTrader.NinjaScript.Indicators
     }
 
     public class PointsCalculation : ZigZagDP
-	{
-		#region Variables
-		private double 	lastPrice;
-		
-		private bool 	isFirstLowValue;
-		private bool 	isFirstHighValue;
-		
-		private bool 	isFalling;
-		private bool 	isRising;
-		
-		private bool 	isOverLowPipDiff;
-		private bool 	isOverHighPipDiff;
-		#endregion
-				
-		public PointsCalculation(DowPivot dp) : base(dp)
-		{		
-			isFirstLowValue 	= true;
-			isFirstHighValue 	= true;
+    {
+        #region Variables
+        private double lastPrice;
+
+        private bool isFirstLowValue;
+        private bool isFirstHighValue;
+
+        private bool isFalling;
+        private bool isRising;
+
+        private bool isOverLowPipDiff;
+        private bool isOverHighPipDiff;
+        #endregion
+
+        public PointsCalculation(DowPivot dp) : base(dp)
+        {
+            isFirstLowValue = true;
+            isFirstHighValue = true;
         }
 
-		public override void Calculate(DowPivot dp)
-		{
-			//Calculation
-			isFalling 				= GetCloseOrHighLow(dp, TrendDir.Down, 0) < GetCloseOrHighLow(dp, TrendDir.Down, 0 + 1);
-			isRising 				= GetCloseOrHighLow(dp, TrendDir.Up, 0) > GetCloseOrHighLow(dp, TrendDir.Up, 0 + 1);
+        public override void Calculate(DowPivot dp)
+        {
+            //Calculation
+            isFalling = GetCloseOrHighLow(dp, TrendDir.Down, 0) < GetCloseOrHighLow(dp, TrendDir.Down, 0 + 1);
+            isRising = GetCloseOrHighLow(dp, TrendDir.Up, 0) > GetCloseOrHighLow(dp, TrendDir.Up, 0 + 1);
 
-			isOverLowPipDiff 		= GetCloseOrHighLow(dp, TrendDir.Down, 0) <= (GetHigh(0).Price - (dp.Strength * (dp.TickSize * 10)));
-			isOverHighPipDiff		= GetCloseOrHighLow(dp, TrendDir.Up, 0) >= (GetLow(0).Price + (dp.Strength * (dp.TickSize * 10)));
-		
-			// Add low
-			if(isFirstLowValue && isFalling && isOverLowPipDiff)
-			{
+            isOverLowPipDiff = GetCloseOrHighLow(dp, TrendDir.Down, 0) <= (GetHigh(0).Price - (dp.Strength * (dp.TickSize * 10)));
+            isOverHighPipDiff = GetCloseOrHighLow(dp, TrendDir.Up, 0) >= (GetLow(0).Price + (dp.Strength * (dp.TickSize * 10)));
+
+            // Add low
+            if (isFirstLowValue && isFalling && isOverLowPipDiff)
+            {
                 AddLow(dp, GetCloseOrHighLow(dp, TrendDir.Down, 0), dp.CurrentBar);
 
                 lastPrice = GetLow(0).Price;
 
                 isFirstLowValue = false;
                 isFirstHighValue = true;
-            }	
-			//Add high
-			else  if(isFirstHighValue && isRising && isOverHighPipDiff)
-			{
+            }
+            //Add high
+            else if (isFirstHighValue && isRising && isOverHighPipDiff)
+            {
                 AddHigh(dp, GetCloseOrHighLow(dp, TrendDir.Up, 0), dp.CurrentBar);
 
                 lastPrice = GetHigh(0).Price;
@@ -440,54 +440,54 @@ namespace NinjaTrader.NinjaScript.Indicators
                 isFirstLowValue = true;
                 isFirstHighValue = false;
             }
-			// Update low
-			if(!isFirstLowValue && isFalling && isOverLowPipDiff && GetCloseOrHighLow(dp, TrendDir.Down, 0) < lastPrice)
-			{
+            // Update low
+            if (!isFirstLowValue && isFalling && isOverLowPipDiff && GetCloseOrHighLow(dp, TrendDir.Down, 0) < lastPrice)
+            {
                 UpdateLow(dp, GetCloseOrHighLow(dp, TrendDir.Down, 0), dp.CurrentBar);
                 lastPrice = GetLow(0).Price;
             }
-			// Update high
-			else if(!isFirstHighValue && isRising && isOverHighPipDiff && GetCloseOrHighLow(dp, TrendDir.Up, 0) > lastPrice)
-			{
+            // Update high
+            else if (!isFirstHighValue && isRising && isOverHighPipDiff && GetCloseOrHighLow(dp, TrendDir.Up, 0) > lastPrice)
+            {
                 UpdateHigh(dp, GetCloseOrHighLow(dp, TrendDir.Up, 0), dp.CurrentBar);
                 lastPrice = GetHigh(0).Price;
             }
-		}
+        }
 
         #region Methods
-        public override TrendDir GetCurrentHighLowLeg() 
+        public override TrendDir GetCurrentHighLowLeg()
         {
             if (isFirstLowValue)
                 return TrendDir.Up;
             else
                 return TrendDir.Down;
         }
-		private double GetCloseOrHighLow(DowPivot _dp, TrendDir trendDir, int _barsAgo)
-		{
-			if(trendDir == TrendDir.Down)
-			{
-				if(_dp.UseHighLow)
-					return _dp.Low[_barsAgo];
-				else
-					return _dp.Close[_barsAgo];
-			}
-			else if(trendDir == TrendDir.Up)
-			{
-				if(_dp.UseHighLow)
-					return _dp.High[_barsAgo];
-				else
-					return _dp.Close[_barsAgo];
-			}
-			return 0;
-		}
+        private double GetCloseOrHighLow(DowPivot _dp, TrendDir trendDir, int _barsAgo)
+        {
+            if (trendDir == TrendDir.Down)
+            {
+                if (_dp.UseHighLow)
+                    return _dp.Low[_barsAgo];
+                else
+                    return _dp.Close[_barsAgo];
+            }
+            else if (trendDir == TrendDir.Up)
+            {
+                if (_dp.UseHighLow)
+                    return _dp.High[_barsAgo];
+                else
+                    return _dp.Close[_barsAgo];
+            }
+            return 0;
+        }
         #endregion
     }
 
     public class PivotPointsLogic
-	{
+    {
         #region Variables
-        private PivotPoint low  = new PivotPoint();
-        private PivotPoint high = new PivotPoint();
+        private readonly PivotPoint low = new PivotPoint();
+        private readonly PivotPoint high = new PivotPoint();
 
         private PivotPoint currentPP;
 
@@ -519,27 +519,25 @@ namespace NinjaTrader.NinjaScript.Indicators
 
         public void Calculate(DowPivot dp, ZigZagDP zigZagDP)
         {
-            if (zigZagDP.GetLow(1).Price     == 0 ||
-                zigZagDP.GetLow(0).Price     == 0 ||
-                zigZagDP.GetHigh(1).Price    == 0 ||
-                zigZagDP.GetHigh(0).Price    == 0)
+            if (zigZagDP.GetLow(1).Price == 0 ||
+                zigZagDP.GetLow(0).Price == 0 ||
+                zigZagDP.GetHigh(1).Price == 0 ||
+                zigZagDP.GetHigh(0).Price == 0)
                 return;
 
             currentPP = new PivotPoint(zigZagDP.GetLow(1), zigZagDP.GetLow(0), zigZagDP.GetHigh(1), zigZagDP.GetHigh(0));
 
-            isFalling =     currentPP.low2.Price < currentPP.low1.Price &&
+            isFalling = currentPP.low2.Price < currentPP.low1.Price &&
                             currentPP.high2.Price < currentPP.high1.Price;
 
-            isRising =      currentPP.low2.Price > currentPP.low1.Price &&
+            isRising = currentPP.low2.Price > currentPP.low1.Price &&
                             currentPP.high2.Price > currentPP.high1.Price;
-            
-            downFilter =    !IsOverMaxPercentPivotRetracement(dp, TrendDir.Down, currentPP) &&
-                            !IsOverMinPercentPivotRetracement(dp, TrendDir.Down, currentPP) /*&&
-                            !IsOverAveragePeriod(dp, currentPP, TrendDir.Down)*/;
 
-            upFilter =      !IsOverMaxPercentPivotRetracement(dp, TrendDir.Up, currentPP) &&
-                            !IsOverMinPercentPivotRetracement(dp, TrendDir.Up, currentPP)/* &&
-                            !IsOverAveragePeriod(dp, currentPP, TrendDir.Up)*/;
+            downFilter = !IsOverMaxPercentPivotRetracement(dp, TrendDir.Down, currentPP) &&
+                            !IsOverMinPercentPivotRetracement(dp, TrendDir.Down, currentPP);
+
+            upFilter = !IsOverMaxPercentPivotRetracement(dp, TrendDir.Up, currentPP) &&
+                            !IsOverMinPercentPivotRetracement(dp, TrendDir.Up, currentPP);
 
             // Add low pivot
             if (isFalling && downFilter && zigZagDP.GetCurrentHighLowLeg() == TrendDir.Down && lastTrend != TrendDir.Down)
@@ -621,33 +619,33 @@ namespace NinjaTrader.NinjaScript.Indicators
         {
             line1 = "Line 1 " + dp.CurrentBar;
             line2 = "Line 2 " + dp.CurrentBar;
-            
-            switch(state)
+
+            switch (state)
             {
                 case Situation.AddHigh:
                     lastHighLegTagLine3 = "Line 3 " + dp.CurrentBar;
-                    Draw.Line(dp, line1, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, high.low1.BarIndex), high.low1.Price, 
+                    Draw.Line(dp, line1, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, high.low1.BarIndex), high.low1.Price,
                         Miscellaneous.ConvertBarIndexToBarsAgo(dp, high.high1.BarIndex), high.high1.Price, Brushes.Green, DashStyleHelper.Solid, dp.DrawProp.ZigZagWidth);
-                    Draw.Line(dp, line2, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, high.high1.BarIndex), high.high1.Price, 
+                    Draw.Line(dp, line2, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, high.high1.BarIndex), high.high1.Price,
                         Miscellaneous.ConvertBarIndexToBarsAgo(dp, high.low2.BarIndex), high.low2.Price, Brushes.Green, DashStyleHelper.Solid, dp.DrawProp.ZigZagWidth);
-                    Draw.Line(dp, lastHighLegTagLine3, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, high.low2.BarIndex), high.low2.Price, 
+                    Draw.Line(dp, lastHighLegTagLine3, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, high.low2.BarIndex), high.low2.Price,
                         Miscellaneous.ConvertBarIndexToBarsAgo(dp, high.high2.BarIndex), high.high2.Price, Brushes.Green, DashStyleHelper.Solid, dp.DrawProp.ZigZagWidth);
                     break;
                 case Situation.AddLow:
                     lastLowLegTagLine3 = "Line 3 " + dp.CurrentBar;
-                    Draw.Line(dp, line1, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, low.high1.BarIndex), low.high1.Price, 
+                    Draw.Line(dp, line1, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, low.high1.BarIndex), low.high1.Price,
                         Miscellaneous.ConvertBarIndexToBarsAgo(dp, low.low1.BarIndex), low.low1.Price, Brushes.Red, DashStyleHelper.Solid, dp.DrawProp.ZigZagWidth);
-                    Draw.Line(dp, line2, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, low.low1.BarIndex), low.low1.Price, 
+                    Draw.Line(dp, line2, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, low.low1.BarIndex), low.low1.Price,
                         Miscellaneous.ConvertBarIndexToBarsAgo(dp, low.high2.BarIndex), low.high2.Price, Brushes.Red, DashStyleHelper.Solid, dp.DrawProp.ZigZagWidth);
-                    Draw.Line(dp, lastLowLegTagLine3, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, low.high2.BarIndex), low.high2.Price, 
+                    Draw.Line(dp, lastLowLegTagLine3, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, low.high2.BarIndex), low.high2.Price,
                         Miscellaneous.ConvertBarIndexToBarsAgo(dp, low.low2.BarIndex), low.low2.Price, Brushes.Red, DashStyleHelper.Solid, dp.DrawProp.ZigZagWidth);
                     break;
                 case Situation.UpdateHigh:
-                    Draw.Line(dp, lastHighLegTagLine3, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, high.low2.BarIndex), high.low2.Price, 
+                    Draw.Line(dp, lastHighLegTagLine3, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, high.low2.BarIndex), high.low2.Price,
                         Miscellaneous.ConvertBarIndexToBarsAgo(dp, high.high2.BarIndex), high.high2.Price, Brushes.Green, DashStyleHelper.Solid, dp.DrawProp.ZigZagWidth);
                     break;
                 case Situation.UpdateLow:
-                    Draw.Line(dp, lastLowLegTagLine3, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, low.high2.BarIndex), low.high2.Price, 
+                    Draw.Line(dp, lastLowLegTagLine3, false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, low.high2.BarIndex), low.high2.Price,
                         Miscellaneous.ConvertBarIndexToBarsAgo(dp, low.low2.BarIndex), low.low2.Price, Brushes.Red, DashStyleHelper.Solid, dp.DrawProp.ZigZagWidth);
                     break;
             }
@@ -657,10 +655,10 @@ namespace NinjaTrader.NinjaScript.Indicators
             switch (trendDir)
             {
                 case TrendDir.Down:
-                    double nDown =  pp.high1.Price - pp.low1.Price < 0 ? 
-                                    (pp.high1.Price - pp.low1.Price) * -1 : 
+                    double nDown = pp.high1.Price - pp.low1.Price < 0 ?
+                                    (pp.high1.Price - pp.low1.Price) * -1 :
                                     pp.high1.Price - pp.low1.Price;
-                    double downLimit = (dp.FiboPivot.MaxPercentOfPivotRetraction/100) * nDown;
+                    double downLimit = (dp.FiboPivot.MaxPercentOfPivotRetraction / 100) * nDown;
 
                     downLimit += pp.low1.Price;
 
@@ -669,7 +667,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
                     break;
                 case TrendDir.Up:
-                    double nUp =    pp.low1.Price - pp.high1.Price < 0 ?
+                    double nUp = pp.low1.Price - pp.high1.Price < 0 ?
                                     (pp.low1.Price - pp.high1.Price) * -1 :
                                     pp.low1.Price - pp.high1.Price;
                     double upLimit = (dp.FiboPivot.MaxPercentOfPivotRetraction / 100) * nUp;
@@ -689,7 +687,7 @@ namespace NinjaTrader.NinjaScript.Indicators
             switch (trendDir)
             {
                 case TrendDir.Down:
-                    double nDown =  pp.high1.Price - pp.low1.Price < 0 ?
+                    double nDown = pp.high1.Price - pp.low1.Price < 0 ?
                                     (pp.high1.Price - pp.low1.Price) * -1 :
                                     pp.high1.Price - pp.low1.Price;
                     double downLimit = (dp.FiboPivot.MinPercentOfPivotRetraction / 100) * nDown;
@@ -701,7 +699,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
                     break;
                 case TrendDir.Up:
-                    double nUp =    pp.low1.Price - pp.high1.Price < 0 ?
+                    double nUp = pp.low1.Price - pp.high1.Price < 0 ?
                                     (pp.low1.Price - pp.high1.Price) * -1 :
                                     pp.low1.Price - pp.high1.Price;
 
@@ -715,34 +713,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 
                     break;
             }
-            return false;
-        }
-        private bool IsOverAveragePeriod(DowPivot dp, PivotPoint pp, TrendDir trendDir)
-        {
-            switch(trendDir)
-            {
-                case TrendDir.Down:
-                    int downAveragePeriod = pp.high1.BarIndex - pp.high2.BarIndex < 0 ?
-                                            (pp.high1.BarIndex - pp.high2.BarIndex) * -1 :
-                                            pp.high1.BarIndex - pp.high2.BarIndex;
-
-                    if (dp.CurrentBar > (pp.high2.BarIndex + downAveragePeriod))
-                    {
-                        return true;
-                    }
-                        
-                    break;
-                case TrendDir.Up:
-                    int upAveragePeriod =   pp.low1.BarIndex - pp.low2.BarIndex < 0 ?
-                                            (pp.low1.BarIndex - pp.low2.BarIndex) * -1 :
-                                            pp.low1.BarIndex - pp.low2.BarIndex;
-
-                    if (dp.CurrentBar > (pp.low2.BarIndex + upAveragePeriod))
-                        return true;
-                    
-                    break;
-            }
-            
             return false;
         }
         private void SetPlotBuyOrSell(DowPivot dp, TrendDir trendDir)
@@ -761,13 +731,15 @@ namespace NinjaTrader.NinjaScript.Indicators
             }
         }
         private void SetStopLossPrice(DowPivot dp, double price)
-        { 
+        {
             dp.StopLossPriceSignal[0] = price;
         }
         private void SetProfitTargetPrice(DowPivot dp, PivotPoint pp, TrendDir trendDir)
         {
             if (dp.ShowTargetAndStop)
             {
+                // Set where will be drawn the finish target line
+                const int endLine = -4;
                 switch (trendDir)
                 {
                     case TrendDir.Down:
@@ -779,7 +751,8 @@ namespace NinjaTrader.NinjaScript.Indicators
                         downTarget -= pp.high2.Price;
                         downTarget *= -1; // Inverte valor negativo para positivo
 
-                        Draw.Line(dp, dp.CurrentBar.ToString(), false, 0, downTarget, -4, downTarget, Brushes.Red, DashStyleHelper.Solid, 2);
+                        Draw.Line(dp, dp.CurrentBar.ToString(), false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, pp.low1.BarIndex),
+                            downTarget, endLine, downTarget, Brushes.Red, DashStyleHelper.Solid, 2);
 
                         dp.ProfitTargetPriceSignal[0] = downTarget;
                         break;
@@ -791,7 +764,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 
                         upTarget += pp.low2.Price;
 
-                        Draw.Line(dp, dp.CurrentBar.ToString(), false, 0, upTarget, -4, upTarget, Brushes.Green, DashStyleHelper.Solid, 2);
+                        Draw.Line(dp, dp.CurrentBar.ToString(), false, Miscellaneous.ConvertBarIndexToBarsAgo(dp, pp.high1.BarIndex),
+                            upTarget, endLine, upTarget, Brushes.Green, DashStyleHelper.Solid, 2);
 
                         dp.ProfitTargetPriceSignal[0] = upTarget;
                         break;
@@ -806,7 +780,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
     #region Data classes
     public class HighLowPoint
-	{
+    {
         public double Price { get; private set; }
         public int BarIndex { get; private set; }
         public int PointIndex { get; private set; }
@@ -827,18 +801,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 
         public HighLowPoint(DowPivot dp, double price, int barIndex, int pointIndex, TrendDir trendDir)
         {
-            this.Price      = price;
-            this.BarIndex   = barIndex;
+            this.Price = price;
+            this.BarIndex = barIndex;
             this.PointIndex = pointIndex;
-            this.trendDir   = trendDir;
+            this.trendDir = trendDir;
             PrintPoint(dp);
         }
         #endregion
 
         public void Update(DowPivot dp, double price, int barIndex)
         {
-            this.Price      = price;
-            this.BarIndex   = barIndex;
+            this.Price = price;
+            this.BarIndex = barIndex;
             PrintPoint(dp);
         }
         private void PrintPoint(DowPivot dp)
@@ -856,14 +830,14 @@ namespace NinjaTrader.NinjaScript.Indicators
                                 Miscellaneous.ConvertBarIndexToBarsAgo(dp, BarIndex), Price, Brushes.Green).OutlineBrush = Brushes.Transparent;
                     break;
             }
-            
+
         }
     }
 
-    public abstract class ZigZagDP : ZigZagBasicFunctions
+    public abstract class ZigZagDP : IZigZagBasicFunctions
     {
-        private List<HighLowPoint> lows;
-        private List<HighLowPoint> highs;
+        private readonly List<HighLowPoint> lows;
+        private readonly List<HighLowPoint> highs;
         private string lowTagName;
         private string highTagName;
 
@@ -903,7 +877,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         }
         protected void UpdateLow(DowPivot dp, double price, int barIndex)
         {
-            lows[lows.Count-1].Update(dp, price, barIndex);
+            lows[lows.Count - 1].Update(dp, price, barIndex);
             PrintZigZagLines(dp, Situation.UpdateLow);
         }
         protected void UpdateHigh(DowPivot dp, double price, int barIndex)
@@ -923,7 +897,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                         lowTagName = "Low line" + dp.CurrentBar;
                         Draw.Line(dp, lowTagName, false,
                             Miscellaneous.ConvertBarIndexToBarsAgo(dp, GetHigh(0).BarIndex), GetHigh(0).Price,
-                            Miscellaneous.ConvertBarIndexToBarsAgo(dp, GetLow(0).BarIndex), GetLow(0).Price, 
+                            Miscellaneous.ConvertBarIndexToBarsAgo(dp, GetLow(0).BarIndex), GetLow(0).Price,
                             dp.DrawProp.ZigZagColor, DashStyleHelper.Solid, dp.DrawProp.ZigZagWidth);
                         break;
                     case Situation.AddHigh:
@@ -958,7 +932,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         public abstract TrendDir GetCurrentHighLowLeg();
     }
 
-    public interface ZigZagBasicFunctions
+    public interface IZigZagBasicFunctions
     {
         void Calculate(DowPivot dp);
         TrendDir GetCurrentHighLowLeg();
@@ -972,18 +946,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 
         public PivotPoint()
         {
-            this.low1   = new HighLowPoint();
-            this.low2   = new HighLowPoint();
-            this.high1  = new HighLowPoint();
-            this.high2  = new HighLowPoint();
+            this.low1 = new HighLowPoint();
+            this.low2 = new HighLowPoint();
+            this.high1 = new HighLowPoint();
+            this.high2 = new HighLowPoint();
         }
 
         public PivotPoint(HighLowPoint low1, HighLowPoint low2, HighLowPoint high1, HighLowPoint high2)
         {
-            this.low1   = new HighLowPoint(low1);
-            this.low2   = new HighLowPoint(low2);
-            this.high1  = new HighLowPoint(high1);
-            this.high2  = new HighLowPoint(high2);
+            this.low1 = new HighLowPoint(low1);
+            this.low2 = new HighLowPoint(low2);
+            this.high1 = new HighLowPoint(high1);
+            this.high2 = new HighLowPoint(high2);
         }
     }
     #endregion
@@ -1007,19 +981,19 @@ namespace NinjaTrader.NinjaScript.Indicators
     }
 
     #region ENUMs
-    public enum Situation 
-	{
-		AddLow,
-		AddHigh,
-		UpdateLow,
-		UpdateHigh
-	};
-	public enum TrendDir
-	{
-		Up,
-		Down,
-		Unknown
-	};
+    public enum Situation
+    {
+        AddLow,
+        AddHigh,
+        UpdateLow,
+        UpdateHigh
+    };
+    public enum TrendDir
+    {
+        Up,
+        Down,
+        Unknown
+    };
     public enum ZigZagCalculationType
     {
         Points,
