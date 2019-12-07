@@ -103,7 +103,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                 Print("Current bar: " + CurrentBar);
             }
         }
-
+        // Test
         #region Properties
         [Browsable(false)]
         [XmlIgnore]
@@ -127,7 +127,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         }
 
         /************************************** Zig Zag parameters **************************************/
-        [NinjaScriptProperty]
+        //[NinjaScriptProperty]
         [Display(Name = "Calculation type", Order = 0, GroupName = "1 Zig Zag parameters")]
         public ZigZagCalculationType CalculationType
         { get; set; }
@@ -144,7 +144,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         { get; set; }
 
         // Sub menu of draw objects from zigzag
-        [NinjaScriptProperty]
+        //[NinjaScriptProperty]
         [Display(Name = "Draw properties", Order = 5, GroupName = "1 Zig Zag parameters")]
         public DrawProperties DrawProp
         { get; set; }
@@ -222,7 +222,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         { get; set; }
 
         // Sub menu of pivot retractions filters
-        [NinjaScriptProperty]
+        //[NinjaScriptProperty]
         [Display(Name = "Fibo Pivot Retraction", Order = 3, GroupName = "2 Pivot parameters")]
         public FiboPivotRetraction FiboPivot
         { get; set; }
@@ -1013,18 +1013,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private DowPivot[] cacheDowPivot;
-		public DowPivot DowPivot()
+		public DowPivot DowPivot(double strength, bool useHighLow, double percentProfitTargetFibo)
 		{
-			return DowPivot(Input);
+			return DowPivot(Input, strength, useHighLow, percentProfitTargetFibo);
 		}
 
-		public DowPivot DowPivot(ISeries<double> input)
+		public DowPivot DowPivot(ISeries<double> input, double strength, bool useHighLow, double percentProfitTargetFibo)
 		{
 			if (cacheDowPivot != null)
 				for (int idx = 0; idx < cacheDowPivot.Length; idx++)
-					if (cacheDowPivot[idx] != null &&  cacheDowPivot[idx].EqualsInput(input))
+					if (cacheDowPivot[idx] != null && cacheDowPivot[idx].Strength == strength && cacheDowPivot[idx].UseHighLow == useHighLow && cacheDowPivot[idx].PercentProfitTargetFibo == percentProfitTargetFibo && cacheDowPivot[idx].EqualsInput(input))
 						return cacheDowPivot[idx];
-			return CacheIndicator<DowPivot>(new DowPivot(), input, ref cacheDowPivot);
+			return CacheIndicator<DowPivot>(new DowPivot(){ Strength = strength, UseHighLow = useHighLow, PercentProfitTargetFibo = percentProfitTargetFibo }, input, ref cacheDowPivot);
 		}
 	}
 }
@@ -1033,14 +1033,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.DowPivot DowPivot()
+		public Indicators.DowPivot DowPivot(double strength, bool useHighLow, double percentProfitTargetFibo)
 		{
-			return indicator.DowPivot(Input);
+			return indicator.DowPivot(Input, strength, useHighLow, percentProfitTargetFibo);
 		}
 
-		public Indicators.DowPivot DowPivot(ISeries<double> input )
+		public Indicators.DowPivot DowPivot(ISeries<double> input , double strength, bool useHighLow, double percentProfitTargetFibo)
 		{
-			return indicator.DowPivot(input);
+			return indicator.DowPivot(input, strength, useHighLow, percentProfitTargetFibo);
 		}
 	}
 }
@@ -1049,14 +1049,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.DowPivot DowPivot()
+		public Indicators.DowPivot DowPivot(double strength, bool useHighLow, double percentProfitTargetFibo)
 		{
-			return indicator.DowPivot(Input);
+			return indicator.DowPivot(Input, strength, useHighLow, percentProfitTargetFibo);
 		}
 
-		public Indicators.DowPivot DowPivot(ISeries<double> input )
+		public Indicators.DowPivot DowPivot(ISeries<double> input , double strength, bool useHighLow, double percentProfitTargetFibo)
 		{
-			return indicator.DowPivot(input);
+			return indicator.DowPivot(input, strength, useHighLow, percentProfitTargetFibo);
 		}
 	}
 }
