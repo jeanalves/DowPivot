@@ -103,7 +103,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                 Print("Current bar: " + CurrentBar);
             }
         }
-
+        // Test
         #region Properties
         [Browsable(false)]
         [XmlIgnore]
@@ -1013,18 +1013,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private DowPivot[] cacheDowPivot;
-		public DowPivot DowPivot()
+		public DowPivot DowPivot(ZigZagCalculationType calculationType, double strength, bool useHighLow, DrawProperties drawProp, double percentProfitTargetFibo, FiboPivotRetraction fiboPivot)
 		{
-			return DowPivot(Input);
+			return DowPivot(Input, calculationType, strength, useHighLow, drawProp, percentProfitTargetFibo, fiboPivot);
 		}
 
-		public DowPivot DowPivot(ISeries<double> input)
+		public DowPivot DowPivot(ISeries<double> input, ZigZagCalculationType calculationType, double strength, bool useHighLow, DrawProperties drawProp, double percentProfitTargetFibo, FiboPivotRetraction fiboPivot)
 		{
 			if (cacheDowPivot != null)
 				for (int idx = 0; idx < cacheDowPivot.Length; idx++)
-					if (cacheDowPivot[idx] != null &&  cacheDowPivot[idx].EqualsInput(input))
+					if (cacheDowPivot[idx] != null && cacheDowPivot[idx].CalculationType == calculationType && cacheDowPivot[idx].Strength == strength && cacheDowPivot[idx].UseHighLow == useHighLow && cacheDowPivot[idx].DrawProp == drawProp && cacheDowPivot[idx].PercentProfitTargetFibo == percentProfitTargetFibo && cacheDowPivot[idx].FiboPivot == fiboPivot && cacheDowPivot[idx].EqualsInput(input))
 						return cacheDowPivot[idx];
-			return CacheIndicator<DowPivot>(new DowPivot(), input, ref cacheDowPivot);
+			return CacheIndicator<DowPivot>(new DowPivot(){ CalculationType = calculationType, Strength = strength, UseHighLow = useHighLow, DrawProp = drawProp, PercentProfitTargetFibo = percentProfitTargetFibo, FiboPivot = fiboPivot }, input, ref cacheDowPivot);
 		}
 	}
 }
@@ -1033,14 +1033,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.DowPivot DowPivot()
+		public Indicators.DowPivot DowPivot(ZigZagCalculationType calculationType, double strength, bool useHighLow, DrawProperties drawProp, double percentProfitTargetFibo, FiboPivotRetraction fiboPivot)
 		{
-			return indicator.DowPivot(Input);
+			return indicator.DowPivot(Input, calculationType, strength, useHighLow, drawProp, percentProfitTargetFibo, fiboPivot);
 		}
 
-		public Indicators.DowPivot DowPivot(ISeries<double> input )
+		public Indicators.DowPivot DowPivot(ISeries<double> input , ZigZagCalculationType calculationType, double strength, bool useHighLow, DrawProperties drawProp, double percentProfitTargetFibo, FiboPivotRetraction fiboPivot)
 		{
-			return indicator.DowPivot(input);
+			return indicator.DowPivot(input, calculationType, strength, useHighLow, drawProp, percentProfitTargetFibo, fiboPivot);
 		}
 	}
 }
@@ -1049,14 +1049,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.DowPivot DowPivot()
+		public Indicators.DowPivot DowPivot(ZigZagCalculationType calculationType, double strength, bool useHighLow, DrawProperties drawProp, double percentProfitTargetFibo, FiboPivotRetraction fiboPivot)
 		{
-			return indicator.DowPivot(Input);
+			return indicator.DowPivot(Input, calculationType, strength, useHighLow, drawProp, percentProfitTargetFibo, fiboPivot);
 		}
 
-		public Indicators.DowPivot DowPivot(ISeries<double> input )
+		public Indicators.DowPivot DowPivot(ISeries<double> input , ZigZagCalculationType calculationType, double strength, bool useHighLow, DrawProperties drawProp, double percentProfitTargetFibo, FiboPivotRetraction fiboPivot)
 		{
-			return indicator.DowPivot(input);
+			return indicator.DowPivot(input, calculationType, strength, useHighLow, drawProp, percentProfitTargetFibo, fiboPivot);
 		}
 	}
 }
