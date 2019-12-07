@@ -71,6 +71,10 @@ namespace NinjaTrader.NinjaScript.Indicators
                 sc = new SwingCalculation(this);
                 pc = new PointsCalculation(this);
                 ppl = new PivotPointsLogic(this);
+
+                // Toda vez que a tecla F5 for pressionada automaticamente passara pelo metodo
+                // ClearOutputWindow() e limpara a janela Output das saidas anteriores.
+                ClearOutputWindow();
             }
         }
 
