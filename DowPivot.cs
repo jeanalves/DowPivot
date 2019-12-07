@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
 #endregion
@@ -19,7 +20,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         private SwingCalculation sc;
         private PointsCalculation pc;
         private PivotPointsLogic ppl;
-
+        private KeyEventArgs CurrentKeyDow;
         protected override void OnStateChange()
         {
             if (State == State.SetDefaults)
@@ -71,6 +72,14 @@ namespace NinjaTrader.NinjaScript.Indicators
                 sc = new SwingCalculation(this);
                 pc = new PointsCalculation(this);
                 ppl = new PivotPointsLogic(this);
+
+                if(ChartPanel != null)
+                    ChartPanel.KeyDown += OnKeyDown;
+            }
+            else if(State == State.Terminated)
+            {
+                if (ChartPanel != null)
+                    ChartPanel.KeyDown -= OnKeyDown;
             }
         }
 
@@ -98,6 +107,13 @@ namespace NinjaTrader.NinjaScript.Indicators
                 Print(e.ToString());
                 Print("Current bar: " + CurrentBar);
             }
+            Print(CurrentBar);
+        }
+
+        public void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            CurrentKeyDow = e;
+            Print("Key Dow");
         }
 
         #region Properties
