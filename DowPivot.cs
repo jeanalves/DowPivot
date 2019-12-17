@@ -5,7 +5,6 @@ using NinjaTrader.Gui;
 using NinjaTrader.NinjaScript.DrawingTools;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Windows.Media;
@@ -491,10 +490,10 @@ namespace NinjaTrader.NinjaScript.Indicators
     public class PivotPointsLogic
     {
         #region Variables
-        private readonly PivotPoint low = new PivotPoint();
-        private readonly PivotPoint high = new PivotPoint();
+        private readonly DowPivotPivotPoint low = new DowPivotPivotPoint();
+        private readonly DowPivotPivotPoint high = new DowPivotPivotPoint();
 
-        private PivotPoint currentPP;
+        private DowPivotPivotPoint currentPP;
 
         private bool isFalling;
         private bool isRising;
@@ -530,7 +529,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                 dowPivotZigZag.GetHigh(0).Price == 0)
                 return;
 
-            currentPP = new PivotPoint(dowPivotZigZag.GetLow(1), dowPivotZigZag.GetLow(0), dowPivotZigZag.GetHigh(1), dowPivotZigZag.GetHigh(0));
+            currentPP = new DowPivotPivotPoint(dowPivotZigZag.GetLow(1), dowPivotZigZag.GetLow(0), dowPivotZigZag.GetHigh(1), dowPivotZigZag.GetHigh(0));
 
             isFalling = currentPP.SecondLow.Price < currentPP.FirstLow.Price &&
                             currentPP.SecondHigh.Price < currentPP.FirstHigh.Price;
@@ -655,7 +654,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                     break;
             }
         }
-        private bool IsOverMaxPercentPivotRetracement(DowPivot dowPivot, TrendDir trendDir, PivotPoint pp)
+        private bool IsOverMaxPercentPivotRetracement(DowPivot dowPivot, TrendDir trendDir, DowPivotPivotPoint pp)
         {
             switch (trendDir)
             {
@@ -687,7 +686,7 @@ namespace NinjaTrader.NinjaScript.Indicators
             }
             return false;
         }
-        private bool IsOverMinPercentPivotRetracement(DowPivot dowPivot, TrendDir trendDir, PivotPoint pp)
+        private bool IsOverMinPercentPivotRetracement(DowPivot dowPivot, TrendDir trendDir, DowPivotPivotPoint pp)
         {
             switch (trendDir)
             {
@@ -739,7 +738,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         {
             dowPivot.StopLossPriceSignal[0] = price;
         }
-        private void SetProfitTargetPrice(DowPivot dowPivot, PivotPoint pp, TrendDir trendDir)
+        private void SetProfitTargetPrice(DowPivot dowPivot, DowPivotPivotPoint pp, TrendDir trendDir)
         {
             if (dowPivot.ShowTargetAndStop)
             {
@@ -782,33 +781,6 @@ namespace NinjaTrader.NinjaScript.Indicators
         }
         #endregion
     }
-
-    #region Data classes
-    public class PivotPoint
-    {
-        public DowPivotHighLowPoint FirstLow { get; set; }
-        public DowPivotHighLowPoint SecondLow { get; set; }
-        public DowPivotHighLowPoint FirstHigh { get; set; }
-        public DowPivotHighLowPoint SecondHigh { get; set; }
-
-        public PivotPoint()
-        {
-            this.FirstLow = new DowPivotHighLowPoint();
-            this.SecondLow = new DowPivotHighLowPoint();
-            this.FirstHigh = new DowPivotHighLowPoint();
-            this.SecondHigh = new DowPivotHighLowPoint();
-        }
-
-        public PivotPoint(DowPivotHighLowPoint firstLow, DowPivotHighLowPoint secondLow, DowPivotHighLowPoint firstHigh, DowPivotHighLowPoint secondHigh)
-        {
-            this.FirstLow = new DowPivotHighLowPoint(firstLow);
-            this.SecondLow = new DowPivotHighLowPoint(secondLow);
-            this.FirstHigh = new DowPivotHighLowPoint(firstHigh);
-            this.SecondHigh = new DowPivotHighLowPoint(secondHigh);
-        }
-    }
-    #endregion
-
 }
 
 #region NinjaScript generated code. Neither change nor remove.
