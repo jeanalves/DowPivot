@@ -1,4 +1,4 @@
-namespace NinjaTrader.NinjaScript.Indicators.DowPivotBase
+namespace NinjaTrader.Custom.Indicators.DowPivotBase
 {
     public enum Situation
     {
