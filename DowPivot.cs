@@ -3,7 +3,6 @@ using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.Custom.Indicators.DowPivotBase;
 using NinjaTrader.Gui;
 using NinjaTrader.NinjaScript.DrawingTools;
-using NinjaTrader.NinjaScript.Indicators.DowPivotBase;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -548,10 +547,10 @@ namespace NinjaTrader.NinjaScript.Indicators
             // Add low pivot
             if (isFalling && downFilter && zigZagDP.GetCurrentHighLowLeg() == TrendDir.Down && lastTrend != TrendDir.Down)
             {
-                low.FirstLow = new HighLowPoint(currentPP.FirstLow);
-                low.SecondLow = new HighLowPoint(currentPP.SecondLow);
-                low.FirstHigh = new HighLowPoint(currentPP.FirstHigh);
-                low.SecondHigh = new HighLowPoint(currentPP.SecondHigh);
+                low.FirstLow = new DowPivotHighLowPoint(currentPP.FirstLow);
+                low.SecondLow = new DowPivotHighLowPoint(currentPP.SecondLow);
+                low.FirstHigh = new DowPivotHighLowPoint(currentPP.FirstHigh);
+                low.SecondHigh = new DowPivotHighLowPoint(currentPP.SecondHigh);
 
                 PrintPivots(dowPivot, Situation.AddLow);
 
@@ -566,10 +565,10 @@ namespace NinjaTrader.NinjaScript.Indicators
             // Add high pivot
             else if (isRising && upFilter && zigZagDP.GetCurrentHighLowLeg() == TrendDir.Up && lastTrend != TrendDir.Up)
             {
-                high.FirstLow = new HighLowPoint(currentPP.FirstLow);
-                high.SecondLow = new HighLowPoint(currentPP.SecondLow);
-                high.FirstHigh = new HighLowPoint(currentPP.FirstHigh);
-                high.SecondHigh = new HighLowPoint(currentPP.SecondHigh);
+                high.FirstLow = new DowPivotHighLowPoint(currentPP.FirstLow);
+                high.SecondLow = new DowPivotHighLowPoint(currentPP.SecondLow);
+                high.FirstHigh = new DowPivotHighLowPoint(currentPP.FirstHigh);
+                high.SecondHigh = new DowPivotHighLowPoint(currentPP.SecondHigh);
 
                 PrintPivots(dowPivot, Situation.AddHigh);
 
@@ -584,13 +583,13 @@ namespace NinjaTrader.NinjaScript.Indicators
             // Update low pivot
             else if (isFalling && currentPP.SecondLow.Price < low.SecondLow.Price && !isDownLine3LegEnd && lastTrend == TrendDir.Down)
             {
-                low.SecondLow = new HighLowPoint(currentPP.SecondLow);
+                low.SecondLow = new DowPivotHighLowPoint(currentPP.SecondLow);
                 PrintPivots(dowPivot, Situation.UpdateLow);
             }
             // Update high pivot
             else if (isRising && currentPP.SecondHigh.Price > high.SecondHigh.Price && !isUpLine3LegEnd && lastTrend == TrendDir.Up)
             {
-                high.SecondHigh = new HighLowPoint(currentPP.SecondHigh);
+                high.SecondHigh = new DowPivotHighLowPoint(currentPP.SecondHigh);
                 PrintPivots(dowPivot, Situation.UpdateHigh);
             }
 
@@ -785,72 +784,17 @@ namespace NinjaTrader.NinjaScript.Indicators
     }
 
     #region Data classes
-    public class HighLowPoint
-    {
-        public double Price { get; private set; }
-        public int BarIndex { get; private set; }
-        public int PointIndex { get; private set; }
-        private readonly TrendDir trendDir;
-
-        #region Constructors
-        public HighLowPoint()
-        {
-            trendDir = TrendDir.Unknown;
-        }
-
-        public HighLowPoint(HighLowPoint hlp)
-        {
-            Price = hlp.Price;
-            BarIndex = hlp.BarIndex;
-            trendDir = TrendDir.Unknown;
-        }
-
-        public HighLowPoint(DowPivot dowPivot, double price, int barIndex, int pointIndex, TrendDir trendDir)
-        {
-            this.Price = price;
-            this.BarIndex = barIndex;
-            this.PointIndex = pointIndex;
-            this.trendDir = trendDir;
-            PrintPoint(dowPivot);
-        }
-        #endregion
-
-        public void Update(DowPivot dowPivot, double price, int barIndex)
-        {
-            this.Price = price;
-            this.BarIndex = barIndex;
-            PrintPoint(dowPivot);
-        }
-        private void PrintPoint(DowPivot dowPivot)
-        {
-            if (!dowPivot.DrawProp.ShowTopBottomPoints)
-                return;
-            switch (trendDir)
-            {
-                case TrendDir.Down:
-                    Draw.Dot(dowPivot, (trendDir + " Dot " + PointIndex.ToString()), false,
-                                DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex), Price, Brushes.Red).OutlineBrush = Brushes.Transparent;
-                    break;
-                case TrendDir.Up:
-                    Draw.Dot(dowPivot, (trendDir + " Dot " + PointIndex.ToString()), false,
-                                DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex), Price, Brushes.Green).OutlineBrush = Brushes.Transparent;
-                    break;
-            }
-
-        }
-    }
-
     public abstract class ZigZagDP : IZigZagBasicFunctions
     {
-        private readonly List<HighLowPoint> lows;
-        private readonly List<HighLowPoint> highs;
+        private readonly List<DowPivotHighLowPoint> lows;
+        private readonly List<DowPivotHighLowPoint> highs;
         private string lowTagName;
         private string highTagName;
 
         protected ZigZagDP(DowPivot dowPivot)
         {
-            lows = new List<HighLowPoint>();
-            highs = new List<HighLowPoint>();
+            lows = new List<DowPivotHighLowPoint>();
+            highs = new List<DowPivotHighLowPoint>();
 
             //Inicia lista de HLPoints adcionando 4 novos objetos
             AddLow(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
@@ -860,11 +804,11 @@ namespace NinjaTrader.NinjaScript.Indicators
         }
 
         #region GETs
-        public HighLowPoint GetLow(int pointsAgo)
+        public DowPivotHighLowPoint GetLow(int pointsAgo)
         {
             return lows[lows.Count - 1 - pointsAgo];
         }
-        public HighLowPoint GetHigh(int pointsAgo)
+        public DowPivotHighLowPoint GetHigh(int pointsAgo)
         {
             return highs[highs.Count - 1 - pointsAgo];
         }
@@ -873,12 +817,12 @@ namespace NinjaTrader.NinjaScript.Indicators
         #region SETs
         protected void AddLow(DowPivot dowPivot, double price, int barIndex)
         {
-            lows.Add(new HighLowPoint(dowPivot, price, barIndex, lows.Count, TrendDir.Down));
+            lows.Add(new DowPivotHighLowPoint(dowPivot, price, barIndex, lows.Count, TrendDir.Down));
             PrintZigZagLines(dowPivot, Situation.AddLow);
         }
         protected void AddHigh(DowPivot dowPivot, double price, int barIndex)
         {
-            highs.Add(new HighLowPoint(dowPivot, price, barIndex, highs.Count, TrendDir.Up));
+            highs.Add(new DowPivotHighLowPoint(dowPivot, price, barIndex, highs.Count, TrendDir.Up));
             PrintZigZagLines(dowPivot, Situation.AddHigh);
         }
         protected void UpdateLow(DowPivot dowPivot, double price, int barIndex)
@@ -945,25 +889,25 @@ namespace NinjaTrader.NinjaScript.Indicators
     }
     public class PivotPoint
     {
-        public HighLowPoint FirstLow { get; set; }
-        public HighLowPoint SecondLow { get; set; }
-        public HighLowPoint FirstHigh { get; set; }
-        public HighLowPoint SecondHigh { get; set; }
+        public DowPivotHighLowPoint FirstLow { get; set; }
+        public DowPivotHighLowPoint SecondLow { get; set; }
+        public DowPivotHighLowPoint FirstHigh { get; set; }
+        public DowPivotHighLowPoint SecondHigh { get; set; }
 
         public PivotPoint()
         {
-            this.FirstLow = new HighLowPoint();
-            this.SecondLow = new HighLowPoint();
-            this.FirstHigh = new HighLowPoint();
-            this.SecondHigh = new HighLowPoint();
+            this.FirstLow = new DowPivotHighLowPoint();
+            this.SecondLow = new DowPivotHighLowPoint();
+            this.FirstHigh = new DowPivotHighLowPoint();
+            this.SecondHigh = new DowPivotHighLowPoint();
         }
 
-        public PivotPoint(HighLowPoint firstLow, HighLowPoint secondLow, HighLowPoint firstHigh, HighLowPoint secondHigh)
+        public PivotPoint(DowPivotHighLowPoint firstLow, DowPivotHighLowPoint secondLow, DowPivotHighLowPoint firstHigh, DowPivotHighLowPoint secondHigh)
         {
-            this.FirstLow = new HighLowPoint(firstLow);
-            this.SecondLow = new HighLowPoint(secondLow);
-            this.FirstHigh = new HighLowPoint(firstHigh);
-            this.SecondHigh = new HighLowPoint(secondHigh);
+            this.FirstLow = new DowPivotHighLowPoint(firstLow);
+            this.SecondLow = new DowPivotHighLowPoint(secondLow);
+            this.FirstHigh = new DowPivotHighLowPoint(firstHigh);
+            this.SecondHigh = new DowPivotHighLowPoint(secondHigh);
         }
     }
     #endregion
