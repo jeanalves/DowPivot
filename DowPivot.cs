@@ -2,6 +2,7 @@
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.Gui;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.DowPivotBase;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -983,27 +984,6 @@ namespace NinjaTrader.NinjaScript.Indicators
             return ((barIndex - dowPivot.CurrentBar) < 0) ? ((barIndex - dowPivot.CurrentBar) * -1) : (barIndex - dowPivot.CurrentBar);
         }
     }
-
-    #region ENUMs
-    public enum Situation
-    {
-        AddLow,
-        AddHigh,
-        UpdateLow,
-        UpdateHigh
-    };
-    public enum TrendDir
-    {
-        Up,
-        Down,
-        Unknown
-    };
-    public enum ZigZagCalculationType
-    {
-        Points,
-        Swing
-    }
-    #endregion
 }
 
 #region NinjaScript generated code. Neither change nor remove.
