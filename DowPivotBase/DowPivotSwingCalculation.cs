@@ -42,20 +42,17 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             // para "Up" ou "Down" e em todos os ticks com exce��o do primeiro tick
             if (!dowPivot.IsFirstTickOfBar & lastTrend != TrendDir.Unknown)
             {
-                ArrayList lastLowCacheTick = new ArrayList(lastLowCache);
-                ArrayList lastHighCacheTick = new ArrayList(lastHighCache);
+                // Low logic
+                if (lastTrend == TrendDir.Down && dowPivot.Low[0] < GetLow(0).Price)
+                {
+                    UpdateLow(dowPivot, dowPivot.Low[0], dowPivot.CurrentBar);
+                }
 
-                lastLowCacheTick[lastLowCacheTick.Count - 1] = dowPivot.Low[0];
-                lastHighCacheTick[lastHighCacheTick.Count - 1] = dowPivot.High[0];
-
-                // Low calculations
-                bool isSwingLowTick = true;
-                double swingLowCandidateValueTick = (double)lastLowCacheTick[strength];
-
-                for (int i = 0; i < dowPivot.Strength; i++)
-                    if (((double)lastLowCache[i]).ApproxCompare(swingLowCandidateValueTick) <= 0)
-                        isSwingLowTick = false;
-
+                // High logic
+                if (lastTrend == TrendDir.Up && dowPivot.High[0] > GetHigh(0).Price)
+                {
+                    UpdateHigh(dowPivot, dowPivot.High[0], dowPivot.CurrentBar);
+                }
             }
             // Enter only once per bar
             else if (dowPivot.IsFirstTickOfBar)
