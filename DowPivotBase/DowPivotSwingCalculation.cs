@@ -11,10 +11,6 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private readonly int constant;
         private readonly ArrayList lastLowCache;
         private readonly ArrayList lastHighCache;
-        private bool isSwingLow;
-        private bool isSwingHigh;
-        private double swingLowCandidateValue;
-        private double swingHighCandidateValue;
         private double lastLow;
         private double lastHigh;
         private TrendDir lastTrend;
@@ -38,25 +34,14 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
 
         public override void Calculate(DowPivot dowPivot)
         {
-            // Este "if" � executado apenas quando lastTrend � iniciada alterando de "Unknow"
-            // para "Up" ou "Down" e em todos os ticks com exce��o do primeiro tick
-            if (!dowPivot.IsFirstTickOfBar & lastTrend != TrendDir.Unknown)
-            {
-                // Low logic
-                if (lastTrend == TrendDir.Down && dowPivot.Low[0] < GetLow(0).Price)
-                {
-                    UpdateLow(dowPivot, dowPivot.Low[0], dowPivot.CurrentBar);
-                }
-
-                // High logic
-                if (lastTrend == TrendDir.Up && dowPivot.High[0] > GetHigh(0).Price)
-                {
-                    UpdateHigh(dowPivot, dowPivot.High[0], dowPivot.CurrentBar);
-                }
-            }
             // Enter only once per bar
-            else if (dowPivot.IsFirstTickOfBar)
+            if (dowPivot.IsFirstTickOfBar)
             {
+                bool isSwingLow = false;
+                bool isSwingHigh = false;
+                double swingLowCandidateValue = 0;
+                double swingHighCandidateValue = 0;
+
                 lastLowCache.Add(dowPivot.Low[0 + barsAgoConstant]);
                 if (lastLowCache.Count > constant)
                     lastLowCache.RemoveAt(0);
