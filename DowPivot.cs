@@ -339,7 +339,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                         if (((double)lastLowCache[i]).ApproxCompare(swingLowCandidateValue) <= 0)
                             isSwingLow = false;
 
-                    for (int i = Convert.ToInt32(dowPivot.Strength) + 1; i < lastLowCache.Count; i++)
+                    for (int i = strength + 1; i < lastLowCache.Count; i++)
                         if (((double)lastLowCache[i]).ApproxCompare(swingLowCandidateValue) < 0)
                             isSwingLow = false;
                 }
