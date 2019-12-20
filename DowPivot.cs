@@ -16,7 +16,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
     public class DowPivot : Indicator
     {
-        private SwingCalculation swingCalculation;
+        private DowPivotSwingCalculation swingCalculation;
         private DowPivotPointsCalculation pointsCalculation;
         private DowPivotPivotPointsLogic pivotPointsLogic;
 
@@ -68,7 +68,7 @@ namespace NinjaTrader.NinjaScript.Indicators
             }
             else if (State == State.DataLoaded)
             {
-                swingCalculation = new SwingCalculation(this);
+                swingCalculation = new DowPivotSwingCalculation(this);
                 pointsCalculation = new DowPivotPointsCalculation(this);
                 pivotPointsLogic = new DowPivotPivotPointsLogic(this);
 
@@ -263,135 +263,6 @@ namespace NinjaTrader.NinjaScript.Indicators
             }
         }
         #endregion
-    }
-
-    public class SwingCalculation : DowPivotZigZag
-    {
-        #region Variables
-        private readonly int strength;
-        private readonly int constant;
-        private readonly ArrayList lastLowCache;
-        private readonly ArrayList lastHighCache;
-        private bool isSwingLow;
-        private bool isSwingHigh;
-        private double swingLowCandidateValue;
-        private double swingHighCandidateValue;
-        private double lastLow;
-        private double lastHigh;
-        private TrendDir lastTrend;
-        /// <summary>
-        /// Constante usada para calculos feitos em "OnPriceChange" ou "OnEachTick"
-        /// se n�o usada na atualiza��o dos valores podera causar certa discrepancia neles
-        /// </summary>
-        private const int barsAgoConstant = 1;
-        #endregion
-
-        public SwingCalculation(DowPivot dowPivot) : base(dowPivot)
-        {
-            strength = (int)dowPivot.Strength;
-            constant = (strength * 2) + 1;
-
-            lastLowCache = new ArrayList();
-            lastHighCache = new ArrayList();
-
-            lastTrend = TrendDir.Unknown;
-        }
-
-        public override void Calculate(DowPivot dowPivot)
-        {
-            // Este "if" � executado apenas quando lastTrend � iniciada alterando de "Unknow"
-            // para "Up" ou "Down" e em todos os ticks com exce��o do primeiro tick
-            if (!dowPivot.IsFirstTickOfBar & lastTrend != TrendDir.Unknown)
-            {
-                ArrayList lastLowCacheTick = new ArrayList(lastLowCache);
-                ArrayList lastHighCacheTick = new ArrayList(lastHighCache);
-
-                lastLowCacheTick[lastLowCacheTick.Count - 1] = dowPivot.Low[0];
-                lastHighCacheTick[lastHighCacheTick.Count - 1] = dowPivot.High[0];
-
-                // Low calculations
-                bool isSwingLowTick = true;
-                double swingLowCandidateValueTick = (double)lastLowCacheTick[strength];
-
-                for (int i = 0; i < dowPivot.Strength; i++)
-                    if (((double)lastLowCache[i]).ApproxCompare(swingLowCandidateValueTick) <= 0)
-                        isSwingLowTick = false;
-
-            }
-            // Enter only once per bar
-            else if (dowPivot.IsFirstTickOfBar)
-            {
-                lastLowCache.Add(dowPivot.Low[0 + barsAgoConstant]);
-                if (lastLowCache.Count > constant)
-                    lastLowCache.RemoveAt(0);
-
-                lastHighCache.Add(dowPivot.High[0 + barsAgoConstant]);
-                if (lastHighCache.Count > constant)
-                    lastHighCache.RemoveAt(0);
-
-                // Low calculations
-                if (lastLowCache.Count == constant)
-                {
-                    isSwingLow = true;
-                    swingLowCandidateValue = (double)lastLowCache[strength];
-
-                    for (int i = 0; i < dowPivot.Strength; i++)
-                        if (((double)lastLowCache[i]).ApproxCompare(swingLowCandidateValue) <= 0)
-                            isSwingLow = false;
-
-                    for (int i = strength + 1; i < lastLowCache.Count; i++)
-                        if (((double)lastLowCache[i]).ApproxCompare(swingLowCandidateValue) < 0)
-                            isSwingLow = false;
-                }
-
-                // High calculations
-                if (lastHighCache.Count == constant)
-                {
-                    isSwingHigh = true;
-                    swingHighCandidateValue = (double)lastHighCache[strength];
-
-                    for (int i = 0; i < strength; i++)
-                        if (((double)lastHighCache[i]).ApproxCompare(swingHighCandidateValue) >= 0)
-                            isSwingHigh = false;
-
-                    for (int i = strength + 1; i < lastHighCache.Count; i++)
-                        if (((double)lastHighCache[i]).ApproxCompare(swingHighCandidateValue) > 0)
-                            isSwingHigh = false;
-                }
-
-                // Add low
-                if (isSwingLow && lastTrend != TrendDir.Down)
-                {
-                    AddLow(dowPivot, swingLowCandidateValue, (dowPivot.CurrentBar - strength) - barsAgoConstant);
-                    lastLow = swingLowCandidateValue;
-                    lastTrend = TrendDir.Down;
-                }
-                // Add high
-                if (isSwingHigh && lastTrend != TrendDir.Up)
-                {
-                    AddHigh(dowPivot, swingHighCandidateValue, (dowPivot.CurrentBar - strength) - barsAgoConstant);
-                    lastHigh = swingHighCandidateValue;
-                    lastTrend = TrendDir.Up;
-                }
-                // Update low
-                if (isSwingLow && lastTrend == TrendDir.Down && swingLowCandidateValue < lastLow)
-                {
-                    UpdateLow(dowPivot, swingLowCandidateValue, (dowPivot.CurrentBar - strength) - barsAgoConstant);
-                    lastLow = swingLowCandidateValue;
-                }
-                // Update high
-                if (isSwingHigh && lastTrend == TrendDir.Up && swingHighCandidateValue > lastHigh)
-                {
-                    UpdateHigh(dowPivot, swingHighCandidateValue, (dowPivot.CurrentBar - strength) - barsAgoConstant);
-                    lastHigh = swingHighCandidateValue;
-                }
-            }
-        }
-
-        public override TrendDir GetCurrentHighLowLeg()
-        {
-            return lastTrend;
-        }
     }
 }
 
