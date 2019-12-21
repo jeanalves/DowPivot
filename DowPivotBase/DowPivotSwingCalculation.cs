@@ -6,7 +6,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
 {
     public class DowPivotSwingCalculation : DowPivotZigZag
     {
-        #region Variables
+        #region Fields
         private readonly int strength;
         private readonly int constant;
         private readonly ArrayList lastLowCache;

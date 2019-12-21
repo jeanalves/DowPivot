@@ -4,7 +4,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
 {
     public class DowPivotPointsCalculation : DowPivotZigZag
     {
-        #region Variables
+        #region Fields
         private double lastPrice;
 
         private bool isFirstLowValue;

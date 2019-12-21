@@ -7,7 +7,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
 {
     public class DowPivotPivotPointsLogic
     {
-        #region Variables
+        #region Fields
         private readonly DowPivotPivotPoint low = new DowPivotPivotPoint();
         private readonly DowPivotPivotPoint high = new DowPivotPivotPoint();
 
