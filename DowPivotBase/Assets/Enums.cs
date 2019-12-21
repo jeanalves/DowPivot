@@ -16,6 +16,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
     public enum ZigZagCalculationType
     {
         Points,
-        Swing
+        SwingDelayed,
+        SwingForward
     }
 }

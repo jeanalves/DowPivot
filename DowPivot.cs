@@ -16,7 +16,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
     public class DowPivot : Indicator
     {
-        private SwingCalculation swingCalculation;
+        private SwingDelayedCalculation swingDelayedCalculation;
         private PointsCalculation pointsCalculation;
         private PivotPointsLogic pivotPointsLogic;
 
@@ -39,7 +39,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                 IsSuspendedWhileInactive = true;
 
                 // Zig Zag parameters
-                CalculationType = ZigZagCalculationType.Swing;
+                CalculationType = ZigZagCalculationType.SwingDelayed;
                 Strength = 5;
                 UseHighLow = true;
                 DrawProp = new DrawProperties()
@@ -68,7 +68,7 @@ namespace NinjaTrader.NinjaScript.Indicators
             }
             else if (State == State.DataLoaded)
             {
-                swingCalculation = new SwingCalculation(this);
+                swingDelayedCalculation = new SwingDelayedCalculation(this);
                 pointsCalculation = new PointsCalculation(this);
                 pivotPointsLogic = new PivotPointsLogic(this);
 
@@ -87,9 +87,9 @@ namespace NinjaTrader.NinjaScript.Indicators
             {
                 switch (CalculationType)
                 {
-                    case ZigZagCalculationType.Swing:
-                        swingCalculation.Calculate(this);
-                        pivotPointsLogic.Calculate(this, swingCalculation);
+                    case ZigZagCalculationType.SwingDelayed:
+                        swingDelayedCalculation.Calculate(this);
+                        pivotPointsLogic.Calculate(this, swingDelayedCalculation);
                         break;
                     case ZigZagCalculationType.Points:
                         pointsCalculation.Calculate(this);
