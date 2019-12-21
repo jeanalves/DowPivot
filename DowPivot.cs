@@ -16,8 +16,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
     public class DowPivot : Indicator
     {
-        private SwingDelayedCalculation swingDelayedCalculation;
         private PointsCalculation pointsCalculation;
+        private SwingDelayedCalculation swingDelayedCalculation;
+        private SwingForwardCalculation swingForwardCalculation;
         private PivotPointsLogic pivotPointsLogic;
 
         protected override void OnStateChange()
@@ -68,8 +69,9 @@ namespace NinjaTrader.NinjaScript.Indicators
             }
             else if (State == State.DataLoaded)
             {
-                swingDelayedCalculation = new SwingDelayedCalculation(this);
                 pointsCalculation = new PointsCalculation(this);
+                swingDelayedCalculation = new SwingDelayedCalculation(this);
+                swingForwardCalculation = new SwingForwardCalculation(this);
                 pivotPointsLogic = new PivotPointsLogic(this);
 
                 // Toda vez que a tecla F5 for pressionada automaticamente passara pelo metodo
@@ -87,13 +89,17 @@ namespace NinjaTrader.NinjaScript.Indicators
             {
                 switch (CalculationType)
                 {
+                    case ZigZagCalculationType.Points:
+                        pointsCalculation.Calculate(this);
+                        pivotPointsLogic.Calculate(this, pointsCalculation);
+                        break;
                     case ZigZagCalculationType.SwingDelayed:
                         swingDelayedCalculation.Calculate(this);
                         pivotPointsLogic.Calculate(this, swingDelayedCalculation);
                         break;
-                    case ZigZagCalculationType.Points:
-                        pointsCalculation.Calculate(this);
-                        pivotPointsLogic.Calculate(this, pointsCalculation);
+                    case ZigZagCalculationType.SwingForward:
+                        swingForwardCalculation.Calculate(this);
+                        pivotPointsLogic.Calculate(this, swingForwardCalculation);
                         break;
                 }
             }
