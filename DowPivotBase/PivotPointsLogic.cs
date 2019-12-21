@@ -5,13 +5,13 @@ using System.Windows.Media;
 
 namespace NinjaTrader.Custom.Indicators.DowPivotBase
 {
-    public class DowPivotPivotPointsLogic
+    public class PivotPointsLogic
     {
-        #region Variables
-        private readonly DowPivotPivotPoint low = new DowPivotPivotPoint();
-        private readonly DowPivotPivotPoint high = new DowPivotPivotPoint();
+        #region Fields
+        private readonly PivotPoint low = new PivotPoint();
+        private readonly PivotPoint high = new PivotPoint();
 
-        private DowPivotPivotPoint currentPP;
+        private PivotPoint currentPP;
 
         private bool isFalling;
         private bool isRising;
@@ -32,14 +32,14 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private TrendDir lastTrend = TrendDir.Unknown;
         #endregion
 
-        public DowPivotPivotPointsLogic(DowPivot dowPivot)
+        public PivotPointsLogic(DowPivot dowPivot)
         {
             SetStopLossPrice(dowPivot, dowPivot.Input[0]);                // Initiate
             SetProfitTargetPrice(dowPivot, currentPP, TrendDir.Unknown);  // Initiate
             SetPlotBuyOrSell(dowPivot, TrendDir.Unknown);                 // Set signal to 0 before a entry
         }
 
-        public void Calculate(DowPivot dowPivot, DowPivotZigZag dowPivotZigZag)
+        public void Calculate(DowPivot dowPivot, ZigZag dowPivotZigZag)
         {
             if (dowPivotZigZag.GetLow(1).Price == 0 ||
                 dowPivotZigZag.GetLow(0).Price == 0 ||
@@ -47,7 +47,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                 dowPivotZigZag.GetHigh(0).Price == 0)
                 return;
 
-            currentPP = new DowPivotPivotPoint(dowPivotZigZag.GetLow(1), dowPivotZigZag.GetLow(0), dowPivotZigZag.GetHigh(1), dowPivotZigZag.GetHigh(0));
+            currentPP = new PivotPoint(dowPivotZigZag.GetLow(1), dowPivotZigZag.GetLow(0), dowPivotZigZag.GetHigh(1), dowPivotZigZag.GetHigh(0));
 
             isFalling = currentPP.SecondLow.Price < currentPP.FirstLow.Price &&
                             currentPP.SecondHigh.Price < currentPP.FirstHigh.Price;
@@ -64,10 +64,10 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             // Add low pivot
             if (isFalling && downFilter && dowPivotZigZag.GetCurrentHighLowLeg() == TrendDir.Down && lastTrend != TrendDir.Down)
             {
-                low.FirstLow = new DowPivotHighLowPoint(currentPP.FirstLow);
-                low.SecondLow = new DowPivotHighLowPoint(currentPP.SecondLow);
-                low.FirstHigh = new DowPivotHighLowPoint(currentPP.FirstHigh);
-                low.SecondHigh = new DowPivotHighLowPoint(currentPP.SecondHigh);
+                low.FirstLow = new HighLowPoint(currentPP.FirstLow);
+                low.SecondLow = new HighLowPoint(currentPP.SecondLow);
+                low.FirstHigh = new HighLowPoint(currentPP.FirstHigh);
+                low.SecondHigh = new HighLowPoint(currentPP.SecondHigh);
 
                 PrintPivots(dowPivot, Situation.AddLow);
 
@@ -82,10 +82,10 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             // Add high pivot
             else if (isRising && upFilter && dowPivotZigZag.GetCurrentHighLowLeg() == TrendDir.Up && lastTrend != TrendDir.Up)
             {
-                high.FirstLow = new DowPivotHighLowPoint(currentPP.FirstLow);
-                high.SecondLow = new DowPivotHighLowPoint(currentPP.SecondLow);
-                high.FirstHigh = new DowPivotHighLowPoint(currentPP.FirstHigh);
-                high.SecondHigh = new DowPivotHighLowPoint(currentPP.SecondHigh);
+                high.FirstLow = new HighLowPoint(currentPP.FirstLow);
+                high.SecondLow = new HighLowPoint(currentPP.SecondLow);
+                high.FirstHigh = new HighLowPoint(currentPP.FirstHigh);
+                high.SecondHigh = new HighLowPoint(currentPP.SecondHigh);
 
                 PrintPivots(dowPivot, Situation.AddHigh);
 
@@ -100,13 +100,13 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             // Update low pivot
             else if (isFalling && currentPP.SecondLow.Price < low.SecondLow.Price && !isDownLine3LegEnd && lastTrend == TrendDir.Down)
             {
-                low.SecondLow = new DowPivotHighLowPoint(currentPP.SecondLow);
+                low.SecondLow = new HighLowPoint(currentPP.SecondLow);
                 PrintPivots(dowPivot, Situation.UpdateLow);
             }
             // Update high pivot
             else if (isRising && currentPP.SecondHigh.Price > high.SecondHigh.Price && !isUpLine3LegEnd && lastTrend == TrendDir.Up)
             {
-                high.SecondHigh = new DowPivotHighLowPoint(currentPP.SecondHigh);
+                high.SecondHigh = new HighLowPoint(currentPP.SecondHigh);
                 PrintPivots(dowPivot, Situation.UpdateHigh);
             }
 
@@ -146,33 +146,33 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             {
                 case Situation.AddHigh:
                     lastHighLegTagLine3 = "Line 3 " + dowPivot.CurrentBar;
-                    Draw.Line(dowPivot, line1, false, DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.FirstLow.BarIndex), high.FirstLow.Price,
-                        DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.FirstHigh.BarIndex), high.FirstHigh.Price, Brushes.Green, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
-                    Draw.Line(dowPivot, line2, false, DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.FirstHigh.BarIndex), high.FirstHigh.Price,
-                        DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.SecondLow.BarIndex), high.SecondLow.Price, Brushes.Green, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
-                    Draw.Line(dowPivot, lastHighLegTagLine3, false, DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.SecondLow.BarIndex), high.SecondLow.Price,
-                        DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.SecondHigh.BarIndex), high.SecondHigh.Price, Brushes.Green, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
+                    Draw.Line(dowPivot, line1, false, Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.FirstLow.BarIndex), high.FirstLow.Price,
+                        Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.FirstHigh.BarIndex), high.FirstHigh.Price, Brushes.Green, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
+                    Draw.Line(dowPivot, line2, false, Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.FirstHigh.BarIndex), high.FirstHigh.Price,
+                        Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.SecondLow.BarIndex), high.SecondLow.Price, Brushes.Green, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
+                    Draw.Line(dowPivot, lastHighLegTagLine3, false, Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.SecondLow.BarIndex), high.SecondLow.Price,
+                        Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.SecondHigh.BarIndex), high.SecondHigh.Price, Brushes.Green, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
                     break;
                 case Situation.AddLow:
                     lastLowLegTagLine3 = "Line 3 " + dowPivot.CurrentBar;
-                    Draw.Line(dowPivot, line1, false, DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.FirstHigh.BarIndex), low.FirstHigh.Price,
-                        DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.FirstLow.BarIndex), low.FirstLow.Price, Brushes.Red, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
-                    Draw.Line(dowPivot, line2, false, DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.FirstLow.BarIndex), low.FirstLow.Price,
-                        DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.SecondHigh.BarIndex), low.SecondHigh.Price, Brushes.Red, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
-                    Draw.Line(dowPivot, lastLowLegTagLine3, false, DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.SecondHigh.BarIndex), low.SecondHigh.Price,
-                        DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.SecondLow.BarIndex), low.SecondLow.Price, Brushes.Red, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
+                    Draw.Line(dowPivot, line1, false, Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.FirstHigh.BarIndex), low.FirstHigh.Price,
+                        Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.FirstLow.BarIndex), low.FirstLow.Price, Brushes.Red, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
+                    Draw.Line(dowPivot, line2, false, Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.FirstLow.BarIndex), low.FirstLow.Price,
+                        Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.SecondHigh.BarIndex), low.SecondHigh.Price, Brushes.Red, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
+                    Draw.Line(dowPivot, lastLowLegTagLine3, false, Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.SecondHigh.BarIndex), low.SecondHigh.Price,
+                        Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.SecondLow.BarIndex), low.SecondLow.Price, Brushes.Red, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
                     break;
                 case Situation.UpdateHigh:
-                    Draw.Line(dowPivot, lastHighLegTagLine3, false, DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.SecondLow.BarIndex), high.SecondLow.Price,
-                        DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.SecondHigh.BarIndex), high.SecondHigh.Price, Brushes.Green, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
+                    Draw.Line(dowPivot, lastHighLegTagLine3, false, Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.SecondLow.BarIndex), high.SecondLow.Price,
+                        Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, high.SecondHigh.BarIndex), high.SecondHigh.Price, Brushes.Green, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
                     break;
                 case Situation.UpdateLow:
-                    Draw.Line(dowPivot, lastLowLegTagLine3, false, DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.SecondHigh.BarIndex), low.SecondHigh.Price,
-                        DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.SecondLow.BarIndex), low.SecondLow.Price, Brushes.Red, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
+                    Draw.Line(dowPivot, lastLowLegTagLine3, false, Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.SecondHigh.BarIndex), low.SecondHigh.Price,
+                        Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, low.SecondLow.BarIndex), low.SecondLow.Price, Brushes.Red, DashStyleHelper.Solid, dowPivot.DrawProp.ZigZagWidth);
                     break;
             }
         }
-        private bool IsOverMaxPercentPivotRetracement(DowPivot dowPivot, TrendDir trendDir, DowPivotPivotPoint pp)
+        private bool IsOverMaxPercentPivotRetracement(DowPivot dowPivot, TrendDir trendDir, PivotPoint pp)
         {
             switch (trendDir)
             {
@@ -204,7 +204,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             }
             return false;
         }
-        private bool IsOverMinPercentPivotRetracement(DowPivot dowPivot, TrendDir trendDir, DowPivotPivotPoint pp)
+        private bool IsOverMinPercentPivotRetracement(DowPivot dowPivot, TrendDir trendDir, PivotPoint pp)
         {
             switch (trendDir)
             {
@@ -256,7 +256,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         {
             dowPivot.StopLossPriceSignal[0] = price;
         }
-        private void SetProfitTargetPrice(DowPivot dowPivot, DowPivotPivotPoint pp, TrendDir trendDir)
+        private void SetProfitTargetPrice(DowPivot dowPivot, PivotPoint pp, TrendDir trendDir)
         {
             if (dowPivot.ShowTargetAndStop)
             {
@@ -273,7 +273,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                         downTarget -= pp.SecondHigh.Price;
                         downTarget *= -1; // Inverte valor negativo para positivo
 
-                        Draw.Line(dowPivot, dowPivot.CurrentBar.ToString(), false, DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, pp.FirstLow.BarIndex),
+                        Draw.Line(dowPivot, dowPivot.CurrentBar.ToString(), false, Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, pp.FirstLow.BarIndex),
                             downTarget, endLine, downTarget, Brushes.Red, DashStyleHelper.Solid, 2);
 
                         dowPivot.ProfitTargetPriceSignal[0] = downTarget;
@@ -286,7 +286,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
 
                         upTarget += pp.SecondLow.Price;
 
-                        Draw.Line(dowPivot, dowPivot.CurrentBar.ToString(), false, DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, pp.FirstHigh.BarIndex),
+                        Draw.Line(dowPivot, dowPivot.CurrentBar.ToString(), false, Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, pp.FirstHigh.BarIndex),
                             upTarget, endLine, upTarget, Brushes.Green, DashStyleHelper.Solid, 2);
 
                         dowPivot.ProfitTargetPriceSignal[0] = upTarget;

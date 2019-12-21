@@ -4,7 +4,7 @@ using System.Windows.Media;
 
 namespace NinjaTrader.Custom.Indicators.DowPivotBase
 {
-    public class DowPivotHighLowPoint
+    public class HighLowPoint
     {
 
         public double Price { get; private set; }
@@ -13,19 +13,19 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private readonly TrendDir trendDir;
 
         #region Constructors
-        public DowPivotHighLowPoint()
+        public HighLowPoint()
         {
             trendDir = TrendDir.Unknown;
         }
 
-        public DowPivotHighLowPoint(DowPivotHighLowPoint hlp)
+        public HighLowPoint(HighLowPoint hlp)
         {
             Price = hlp.Price;
             BarIndex = hlp.BarIndex;
             trendDir = TrendDir.Unknown;
         }
 
-        public DowPivotHighLowPoint(DowPivot dowPivot, double price, int barIndex, int pointIndex, TrendDir trendDir)
+        public HighLowPoint(DowPivot dowPivot, double price, int barIndex, int pointIndex, TrendDir trendDir)
         {
             this.Price = price;
             this.BarIndex = barIndex;
@@ -49,11 +49,27 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             {
                 case TrendDir.Down:
                     Draw.Dot(dowPivot, (trendDir + " Dot " + PointIndex.ToString()), false,
-                                DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex), Price, Brushes.Red).OutlineBrush = Brushes.Transparent;
+                        Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex), 
+                        Price, Brushes.Red).OutlineBrush = Brushes.Transparent;
+
+                    Draw.Text(dowPivot, trendDir + " Text " + PointIndex.ToString(), false, PointIndex.ToString(),
+                        Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex),
+                        Price, -15, Brushes.White,
+                        new Gui.Tools.SimpleFont("Arial", 11),
+                        System.Windows.TextAlignment.Center,
+                        Brushes.Transparent, Brushes.Transparent, 100);
                     break;
                 case TrendDir.Up:
                     Draw.Dot(dowPivot, (trendDir + " Dot " + PointIndex.ToString()), false,
-                                DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex), Price, Brushes.Green).OutlineBrush = Brushes.Transparent;
+                        Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex), 
+                        Price, Brushes.Green).OutlineBrush = Brushes.Transparent;
+
+                    Draw.Text(dowPivot, trendDir + " Text " + PointIndex.ToString(), false, PointIndex.ToString(),
+                        Miscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex), 
+                        Price, 15, Brushes.White,
+                        new Gui.Tools.SimpleFont("Arial", 11),
+                        System.Windows.TextAlignment.Center,
+                        Brushes.Transparent, Brushes.Transparent, 100);
                     break;
             }
 

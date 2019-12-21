@@ -16,9 +16,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
     public class DowPivot : Indicator
     {
-        private DowPivotSwingCalculation swingCalculation;
-        private DowPivotPointsCalculation pointsCalculation;
-        private DowPivotPivotPointsLogic pivotPointsLogic;
+        private SwingDelayedCalculation swingDelayedCalculation;
+        private PointsCalculation pointsCalculation;
+        private PivotPointsLogic pivotPointsLogic;
 
         protected override void OnStateChange()
         {
@@ -39,7 +39,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                 IsSuspendedWhileInactive = true;
 
                 // Zig Zag parameters
-                CalculationType = ZigZagCalculationType.Swing;
+                CalculationType = ZigZagCalculationType.SwingDelayed;
                 Strength = 5;
                 UseHighLow = true;
                 DrawProp = new DrawProperties()
@@ -68,9 +68,9 @@ namespace NinjaTrader.NinjaScript.Indicators
             }
             else if (State == State.DataLoaded)
             {
-                swingCalculation = new DowPivotSwingCalculation(this);
-                pointsCalculation = new DowPivotPointsCalculation(this);
-                pivotPointsLogic = new DowPivotPivotPointsLogic(this);
+                swingDelayedCalculation = new SwingDelayedCalculation(this);
+                pointsCalculation = new PointsCalculation(this);
+                pivotPointsLogic = new PivotPointsLogic(this);
 
                 // Toda vez que a tecla F5 for pressionada automaticamente passara pelo metodo
                 // ClearOutputWindow() e limpara a janela Output das saidas anteriores.
@@ -87,9 +87,9 @@ namespace NinjaTrader.NinjaScript.Indicators
             {
                 switch (CalculationType)
                 {
-                    case ZigZagCalculationType.Swing:
-                        swingCalculation.Calculate(this);
-                        pivotPointsLogic.Calculate(this, swingCalculation);
+                    case ZigZagCalculationType.SwingDelayed:
+                        swingDelayedCalculation.Calculate(this);
+                        pivotPointsLogic.Calculate(this, swingDelayedCalculation);
                         break;
                     case ZigZagCalculationType.Points:
                         pointsCalculation.Calculate(this);

@@ -4,9 +4,9 @@ using System.Collections;
 
 namespace NinjaTrader.Custom.Indicators.DowPivotBase
 {
-    public class DowPivotSwingCalculation : DowPivotZigZag
+    public class SwingDelayedCalculation : ZigZag
     {
-        #region Variables
+        #region Fields
         private readonly int strength;
         private readonly int constant;
         private readonly ArrayList lastLowCache;
@@ -21,7 +21,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private const int barsAgoConstant = 1;
         #endregion
 
-        public DowPivotSwingCalculation(DowPivot dowPivot) : base(dowPivot)
+        public SwingDelayedCalculation(DowPivot dowPivot) : base(dowPivot)
         {
             strength = (int)dowPivot.Strength;
             constant = (strength * 2) + 1;
