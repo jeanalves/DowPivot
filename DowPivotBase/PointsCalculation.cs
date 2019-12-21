@@ -2,7 +2,7 @@
 
 namespace NinjaTrader.Custom.Indicators.DowPivotBase
 {
-    public class DowPivotPointsCalculation : DowPivotZigZag
+    public class PointsCalculation : ZigZag
     {
         #region Fields
         private double lastPrice;
@@ -17,7 +17,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private bool isOverHighPipDiff;
         #endregion
 
-        public DowPivotPointsCalculation(DowPivot dowPivot) : base(dowPivot)
+        public PointsCalculation(DowPivot dowPivot) : base(dowPivot)
         {
             isFirstLowValue = true;
             isFirstHighValue = true;

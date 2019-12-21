@@ -16,9 +16,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
     public class DowPivot : Indicator
     {
-        private DowPivotSwingCalculation swingCalculation;
-        private DowPivotPointsCalculation pointsCalculation;
-        private DowPivotPivotPointsLogic pivotPointsLogic;
+        private SwingCalculation swingCalculation;
+        private PointsCalculation pointsCalculation;
+        private PivotPointsLogic pivotPointsLogic;
 
         protected override void OnStateChange()
         {
@@ -68,9 +68,9 @@ namespace NinjaTrader.NinjaScript.Indicators
             }
             else if (State == State.DataLoaded)
             {
-                swingCalculation = new DowPivotSwingCalculation(this);
-                pointsCalculation = new DowPivotPointsCalculation(this);
-                pivotPointsLogic = new DowPivotPivotPointsLogic(this);
+                swingCalculation = new SwingCalculation(this);
+                pointsCalculation = new PointsCalculation(this);
+                pivotPointsLogic = new PivotPointsLogic(this);
 
                 // Toda vez que a tecla F5 for pressionada automaticamente passara pelo metodo
                 // ClearOutputWindow() e limpara a janela Output das saidas anteriores.

@@ -2,7 +2,7 @@
 
 namespace NinjaTrader.Custom.Indicators.DowPivotBase
 {
-    public static class DowPivotMiscellaneous
+    public static class Miscellaneous
     {
         public static double GetCloseOrLow(DowPivot dowPivot)
         {
