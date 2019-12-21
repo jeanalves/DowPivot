@@ -11,6 +11,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private readonly List<DowPivotHighLowPoint> highs;
         private string lowTagName;
         private string highTagName;
+        private int count = 0;
 
         protected DowPivotZigZag(DowPivot dowPivot)
         {
@@ -19,8 +20,8 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
 
             //Inicia lista de HLPoints adcionando 4 novos objetos
             AddLow(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
-            AddLow(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
             AddHigh(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
+            AddLow(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
             AddHigh(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
         }
 
@@ -38,13 +39,15 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         #region SETs
         protected void AddLow(DowPivot dowPivot, double price, int barIndex)
         {
-            lows.Add(new DowPivotHighLowPoint(dowPivot, price, barIndex, lows.Count, TrendDir.Down));
+            lows.Add(new DowPivotHighLowPoint(dowPivot, price, barIndex, count, TrendDir.Down));
             PrintZigZagLines(dowPivot, Situation.AddLow);
+            count++;
         }
         protected void AddHigh(DowPivot dowPivot, double price, int barIndex)
         {
-            highs.Add(new DowPivotHighLowPoint(dowPivot, price, barIndex, highs.Count, TrendDir.Up));
+            highs.Add(new DowPivotHighLowPoint(dowPivot, price, barIndex, count, TrendDir.Up));
             PrintZigZagLines(dowPivot, Situation.AddHigh);
+            count++;
         }
         protected void UpdateLow(DowPivot dowPivot, double price, int barIndex)
         {

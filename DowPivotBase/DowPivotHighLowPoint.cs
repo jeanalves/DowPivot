@@ -49,11 +49,27 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             {
                 case TrendDir.Down:
                     Draw.Dot(dowPivot, (trendDir + " Dot " + PointIndex.ToString()), false,
-                                DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex), Price, Brushes.Red).OutlineBrush = Brushes.Transparent;
+                        DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex), 
+                        Price, Brushes.Red).OutlineBrush = Brushes.Transparent;
+
+                    Draw.Text(dowPivot, trendDir + " Text " + PointIndex.ToString(), false, PointIndex.ToString(),
+                        DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex),
+                        Price, -15, Brushes.White,
+                        new Gui.Tools.SimpleFont("Arial", 11),
+                        System.Windows.TextAlignment.Center,
+                        Brushes.Transparent, Brushes.Transparent, 100);
                     break;
                 case TrendDir.Up:
                     Draw.Dot(dowPivot, (trendDir + " Dot " + PointIndex.ToString()), false,
-                                DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex), Price, Brushes.Green).OutlineBrush = Brushes.Transparent;
+                        DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex), 
+                        Price, Brushes.Green).OutlineBrush = Brushes.Transparent;
+
+                    Draw.Text(dowPivot, trendDir + " Text " + PointIndex.ToString(), false, PointIndex.ToString(),
+                        DowPivotMiscellaneous.ConvertBarIndexToBarsAgo(dowPivot, BarIndex), 
+                        Price, 15, Brushes.White,
+                        new Gui.Tools.SimpleFont("Arial", 11),
+                        System.Windows.TextAlignment.Center,
+                        Brushes.Transparent, Brushes.Transparent, 100);
                     break;
             }
 
