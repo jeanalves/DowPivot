@@ -9,6 +9,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
     {
         private readonly List<HighLowPoint> lows;
         private readonly List<HighLowPoint> highs;
+        private readonly DowPivot dowPivot;
         private string lowTagName;
         private string highTagName;
         private int count = 0;
@@ -18,20 +19,20 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             lows = new List<HighLowPoint>();
             highs = new List<HighLowPoint>();
 
-            //Inicia lista de HLPoints adcionando 4 novos objetos
-            AddLow(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
-            AddHigh(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
-            AddLow(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
-            AddHigh(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
+            this.dowPivot = dowPivot;
         }
 
         #region GETs
         public HighLowPoint GetLow(int pointsAgo)
         {
+            if (lows.Count == 0)
+                return new HighLowPoint(dowPivot, 0, 0, 0, TrendDir.Unknown);
             return lows[lows.Count - 1 - pointsAgo];
         }
         public HighLowPoint GetHigh(int pointsAgo)
         {
+            if (highs.Count == 0)
+                return new HighLowPoint(dowPivot, 0, 0, 0, TrendDir.Unknown);
             return highs[highs.Count - 1 - pointsAgo];
         }
         #endregion
