@@ -64,7 +64,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
 
         private void PrintZigZagLines(DowPivot dowPivot, Situation situation)
         {
-            if (lows.Count > 2 && highs.Count > 2 && dowPivot.DrawProp.ShowZigZag)
+            if (lows.Count != 0 && highs.Count != 0 && dowPivot.DrawProp.ShowZigZag)
             {
                 switch (situation)
                 {
