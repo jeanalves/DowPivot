@@ -9,6 +9,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
     {
         private readonly List<HighLowPoint> lows;
         private readonly List<HighLowPoint> highs;
+        private readonly DowPivot dowPivot;
         private string lowTagName;
         private string highTagName;
         private int count = 0;
@@ -18,20 +19,26 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             lows = new List<HighLowPoint>();
             highs = new List<HighLowPoint>();
 
-            //Inicia lista de HLPoints adcionando 4 novos objetos
-            AddLow(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
-            AddHigh(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
-            AddLow(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
-            AddHigh(dowPivot, dowPivot.Input[0], dowPivot.CurrentBar);
+            this.dowPivot = dowPivot;
         }
 
         #region GETs
         public HighLowPoint GetLow(int pointsAgo)
         {
+            if (lows.Count == 0)
+                return null;
+            else if (lows.Count <= pointsAgo)
+                return null;
+
             return lows[lows.Count - 1 - pointsAgo];
         }
         public HighLowPoint GetHigh(int pointsAgo)
         {
+            if (highs.Count == 0)
+                return null;
+            else if (highs.Count <= pointsAgo)
+                return null;
+
             return highs[highs.Count - 1 - pointsAgo];
         }
         #endregion
@@ -63,7 +70,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
 
         private void PrintZigZagLines(DowPivot dowPivot, Situation situation)
         {
-            if (lows.Count > 2 && highs.Count > 2 && dowPivot.DrawProp.ShowZigZag)
+            if (lows.Count != 0 && highs.Count != 0 && dowPivot.DrawProp.ShowZigZag)
             {
                 switch (situation)
                 {
