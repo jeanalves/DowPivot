@@ -26,13 +26,19 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         public HighLowPoint GetLow(int pointsAgo)
         {
             if (lows.Count == 0)
-                return new HighLowPoint(dowPivot, 0, 0, 0, TrendDir.Unknown);
+                return null;
+            else if (lows.Count <= pointsAgo)
+                return null;
+
             return lows[lows.Count - 1 - pointsAgo];
         }
         public HighLowPoint GetHigh(int pointsAgo)
         {
             if (highs.Count == 0)
-                return new HighLowPoint(dowPivot, 0, 0, 0, TrendDir.Unknown);
+                return null;
+            else if (highs.Count <= pointsAgo)
+                return null;
+
             return highs[highs.Count - 1 - pointsAgo];
         }
         #endregion
