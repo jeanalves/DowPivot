@@ -1,4 +1,6 @@
-﻿using NinjaTrader.NinjaScript.Indicators;
+﻿using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators;
+using System.Windows.Media;
 
 namespace NinjaTrader.Custom.Indicators.DowPivotBase
 {
@@ -17,6 +19,13 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         public static int ConvertBarIndexToBarsAgo(DowPivot dowPivot, int barIndex)
         {
             return ((barIndex - dowPivot.CurrentBar) < 0) ? ((barIndex - dowPivot.CurrentBar) * -1) : (barIndex - dowPivot.CurrentBar);
+        }
+
+        // To debug code
+        public static void DrawText(DowPivot dowPivot, string text, int barsAgo, double price, int yPixelOff)
+        {
+            Draw.Text(dowPivot, "Miscellaneous debug " + dowPivot.CurrentBar + " " + text, false, text, barsAgo, price, yPixelOff, Brushes.White,
+                new Gui.Tools.SimpleFont("Arial", 11), System.Windows.TextAlignment.Center, Brushes.Transparent, Brushes.Transparent, 100);
         }
     }
 }

@@ -82,8 +82,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 
         protected override void OnBarUpdate()
         {
-            if (CurrentBar < 10)
-                return;
+            //if (CurrentBar < 20)
+                //return;
 
             try
             {
