@@ -69,8 +69,16 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                         calculationEstate = CalculationEstate.SecondValue;
                     }
                     else
-                        throw new System.Exception("In the initial calculation of the 'Low' and 'High', they have the same index," +
+                    {
+                        Miscellaneous.PrintError(dowPivot, "In the initial calculation of the 'Low' and 'High', they have the same index," +
                             " Low index: " + lowCandidate.Index + "    High index: " + highCandidate.Index);
+                        dowPivot.Print("Erro");
+                        dowPivot.Print("Erro");
+                        dowPivot.Print("Erro");
+                        dowPivot.Print("Erro");
+                        dowPivot.Print("Erro");
+                        dowPivot.Print("Erro");
+                    }
                 }
                 
             }

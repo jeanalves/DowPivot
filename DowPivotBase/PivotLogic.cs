@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace NinjaTrader.Custom.Indicators.DowPivotBase
 {
-    public class PivotPointsLogic
+    public class PivotLogic
     {
         #region Fields
         private readonly PivotPoint low = new PivotPoint();
@@ -32,7 +32,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private TrendDir lastTrend = TrendDir.Unknown;
         #endregion
 
-        public PivotPointsLogic(DowPivot dowPivot)
+        public PivotLogic(DowPivot dowPivot)
         {
             SetStopLossPrice(dowPivot, dowPivot.Input[0]);                // Initiate
             SetProfitTargetPrice(dowPivot, currentPP, TrendDir.Unknown);  // Initiate

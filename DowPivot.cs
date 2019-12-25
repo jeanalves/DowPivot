@@ -19,7 +19,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         private PointsCalculation pointsCalculation;
         private SwingDelayedCalculation swingDelayedCalculation;
         private SwingForwardCalculation swingForwardCalculation;
-        private PivotPointsLogic pivotPointsLogic;
+        private PivotLogic pivotLogic;
 
         protected override void OnStateChange()
         {
@@ -72,7 +72,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                 pointsCalculation = new PointsCalculation(this);
                 swingDelayedCalculation = new SwingDelayedCalculation(this);
                 swingForwardCalculation = new SwingForwardCalculation(this);
-                pivotPointsLogic = new PivotPointsLogic(this);
+                pivotLogic = new PivotLogic(this);
 
                 // Toda vez que a tecla F5 for pressionada automaticamente passara pelo metodo
                 // ClearOutputWindow() e limpara a janela Output das saidas anteriores.
@@ -91,15 +91,15 @@ namespace NinjaTrader.NinjaScript.Indicators
                 {
                     case ZigZagCalculationType.Points:
                         pointsCalculation.Calculate(this);
-                        pivotPointsLogic.Calculate(this, pointsCalculation);
+                        pivotLogic.Calculate(this, pointsCalculation);
                         break;
                     case ZigZagCalculationType.SwingDelayed:
                         swingDelayedCalculation.Calculate(this);
-                        pivotPointsLogic.Calculate(this, swingDelayedCalculation);
+                        pivotLogic.Calculate(this, swingDelayedCalculation);
                         break;
                     case ZigZagCalculationType.SwingForward:
                         swingForwardCalculation.Calculate(this);
-                        pivotPointsLogic.Calculate(this, swingForwardCalculation);
+                        pivotLogic.Calculate(this, swingForwardCalculation);
                         break;
                 }
             }

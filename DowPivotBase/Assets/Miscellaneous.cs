@@ -27,5 +27,10 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             Draw.Text(dowPivot, "Miscellaneous debug " + dowPivot.CurrentBar + " " + text, false, text, barsAgo, price, yPixelOff, Brushes.White,
                 new Gui.Tools.SimpleFont("Arial", 11), System.Windows.TextAlignment.Center, Brushes.Transparent, Brushes.Transparent, 100);
         }
+
+        public static void PrintError(DowPivot dowPivot, string text)
+        {
+            Draw.TextFixed(dowPivot, "Error debug", text, TextPosition.BottomRight);
+        }
     }
 }
