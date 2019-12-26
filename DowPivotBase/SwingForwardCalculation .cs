@@ -72,108 +72,67 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                     {
                         Miscellaneous.PrintError(dowPivot, "In the initial calculation of the 'Low' and 'High', they have the same index," +
                             " Low index: " + lowCandidate.Index + "    High index: " + highCandidate.Index);
-                        dowPivot.Print("Erro");
-                        dowPivot.Print("Erro");
-                        dowPivot.Print("Erro");
-                        dowPivot.Print("Erro");
-                        dowPivot.Print("Erro");
-                        dowPivot.Print("Erro");
                     }
                 }
                 
             }
-            // Enter only once per bar
-            else if (dowPivot.IsFirstTickOfBar && (calculationEstate == CalculationEstate.SecondValue || calculationEstate == CalculationEstate.HistoricalRealTime))
+            else if(dowPivot.IsFirstTickOfBar && calculationEstate == CalculationEstate.SecondValue)
             {
-                bool isFalling = true;
-                bool isRising = true;
-                bool isOverLowStrength = false;
-                bool isOverHighStrength = false;
+                bool isSwingLow = dowPivot.Low[0] < dowPivot.Low[1];
+                bool isSwingHigh = dowPivot.High[0] > dowPivot.High[1];
 
-                if (lastTrend == TrendDir.Up && calculationEstate == CalculationEstate.SecondValue)
+                if(isSwingLow)
                 {
-                    isOverLowStrength = (dowPivot.CurrentBar - GetHigh(0).BarIndex) >= strength;
-                    calculationEstate = CalculationEstate.HistoricalRealTime;
-                }
-                else if (lastTrend == TrendDir.Down && calculationEstate == CalculationEstate.SecondValue)
-                {
-                    isOverHighStrength = (dowPivot.CurrentBar - GetLow(0).BarIndex) >= strength;
-                    calculationEstate = CalculationEstate.HistoricalRealTime;
-                }
-                else
-                {
-                    isOverLowStrength = (dowPivot.CurrentBar - GetHigh(0).BarIndex) >= strength;
-                    isOverHighStrength = (dowPivot.CurrentBar - GetLow(0).BarIndex) >= strength;
+                    for(int i = 1; i < strength + 1; i++)
+                    {
+                        if(dowPivot.Low[0] >= dowPivot.Low[i])
+                        {
+                            isSwingLow = false;
+                            break;
+                        }
+                    }
                 }
 
-                lastLowCache.Add(dowPivot.Low[barsAgoConstant]);
-                if (lastLowCache.Count > strength)
-                    lastLowCache.RemoveAt(0);
-                double swingLowCandidateValue = (double)lastLowCache[lastLowCache.Count - 1];
-
-                lastHighCache.Add(dowPivot.High[barsAgoConstant]);
-                if (lastHighCache.Count > strength)
-                    lastHighCache.RemoveAt(0);
-                double swingHighCandidateValue = (double)lastHighCache[lastHighCache.Count - 1];
-
-                // Low calculations
-                if (lastLowCache.Count == strength)
+                if(isSwingHigh)
                 {
-                    for (int i = 0; i < strength; i++)
-                        if (swingLowCandidateValue > (double)lastLowCache[i])
-                            isFalling = false;
-                }
-                // High calculations
-                if (lastHighCache.Count == strength)
-                {
-                    for (int i = 0; i < strength; i++)
-                        if (swingHighCandidateValue < (double)lastHighCache[i])
-                            isRising = false;
+                    for(int i = 1; i < strength+1; i++)
+                    {
+                        if(dowPivot.High[0] <= dowPivot.High[i])
+                        {
+                            isSwingHigh = false;
+                            break;
+                        }
+                    }
                 }
 
+                #region CRUD
                 // Add low
-                if (isFalling && isOverLowStrength && lastTrend != TrendDir.Down)
+                if (isSwingLow && lastTrend != TrendDir.Down)
                 {
-                    AddLow(dowPivot, dowPivot.Low[barsAgoConstant], dowPivot.CurrentBar - 1);
-                    lastLow = dowPivot.Low[barsAgoConstant];
+                    AddLow(dowPivot, dowPivot.Low[0], dowPivot.CurrentBar);
+                    lastLow = dowPivot.Low[0];
                     lastTrend = TrendDir.Down;
                 }
                 // Add high
-                else if (isRising && isOverHighStrength && lastTrend != TrendDir.Up)
+                else if(isSwingHigh && lastTrend != TrendDir.Up)
                 {
-                    AddHigh(dowPivot, dowPivot.High[barsAgoConstant], dowPivot.CurrentBar - 1);
-                    lastHigh = dowPivot.High[barsAgoConstant];
+                    AddHigh(dowPivot, dowPivot.High[0], dowPivot.CurrentBar);
+                    lastHigh = dowPivot.High[0];
                     lastTrend = TrendDir.Up;
                 }
-                // Update low
-                else if (isFalling && lastTrend == TrendDir.Down && dowPivot.Low[barsAgoConstant] < lastLow)
-                {
-                    UpdateLow(dowPivot, dowPivot.Low[barsAgoConstant], dowPivot.CurrentBar - 1);
-                    lastLow = dowPivot.Low[barsAgoConstant];
-                }
-                // Update high
-                else if (isRising && lastTrend == TrendDir.Up && dowPivot.High[barsAgoConstant] > lastHigh)
-                {
-                    UpdateHigh(dowPivot, dowPivot.High[barsAgoConstant], dowPivot.CurrentBar - 1);
-                    lastHigh = dowPivot.High[barsAgoConstant];
-                }
-            }
-            // Este "if" � executado apenas quando lastTrend � iniciada alterando de "Unknow"
-            // para "Up" ou "Down" e em todos os ticks com exce��o do primeiro tick
-            else if (!dowPivot.IsFirstTickOfBar && GetLow(0) != null && GetHigh(0) != null &&
-                calculationEstate == CalculationEstate.HistoricalRealTime)
-            {
-                // Low logic 
-                if (lastTrend == TrendDir.Down && dowPivot.Low[0] < GetLow(0).Price)
+                // Update Low
+                else if(isSwingLow && lastTrend == TrendDir.Down && dowPivot.Low[0] < lastLow)
                 {
                     UpdateLow(dowPivot, dowPivot.Low[0], dowPivot.CurrentBar);
+                    lastLow = dowPivot.Low[0];
                 }
-
-                // High logic 
-                if (lastTrend == TrendDir.Up && dowPivot.High[0] > GetHigh(0).Price)
+                // Update High
+                else if(isSwingHigh && lastTrend == TrendDir.Up && dowPivot.High[0] > lastHigh)
                 {
                     UpdateHigh(dowPivot, dowPivot.High[0], dowPivot.CurrentBar);
+                    lastHigh = dowPivot.High[0];
                 }
+                #endregion
             }
         }
 
