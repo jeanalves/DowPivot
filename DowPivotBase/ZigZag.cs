@@ -12,7 +12,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private readonly DowPivot dowPivot;
         private string lowTagName;
         private string highTagName;
-        private int count = 0;
+        public int PointCount { get; private set; }
 
         protected ZigZag(DowPivot dowPivot)
         {
@@ -20,6 +20,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             highs = new List<HighLowPoint>();
 
             this.dowPivot = dowPivot;
+            PointCount = 0;
         }
 
         #region GETs
@@ -46,15 +47,15 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         #region SETs
         protected void AddLow(DowPivot dowPivot, double price, int barIndex)
         {
-            lows.Add(new HighLowPoint(dowPivot, price, barIndex, count, TrendDir.Down));
+            lows.Add(new HighLowPoint(dowPivot, price, barIndex, PointCount, TrendDir.Down));
             PrintZigZagLines(dowPivot, Situation.AddLow);
-            count++;
+            PointCount++;
         }
         protected void AddHigh(DowPivot dowPivot, double price, int barIndex)
         {
-            highs.Add(new HighLowPoint(dowPivot, price, barIndex, count, TrendDir.Up));
+            highs.Add(new HighLowPoint(dowPivot, price, barIndex, PointCount, TrendDir.Up));
             PrintZigZagLines(dowPivot, Situation.AddHigh);
-            count++;
+            PointCount++;
         }
         protected void UpdateLow(DowPivot dowPivot, double price, int barIndex)
         {
@@ -105,6 +106,10 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         }
 
         #region Interface methods
+        /// <summary>
+        /// Used to create the magic
+        /// </summary>
+        /// <param name="dowPivot"></param>
         public abstract void Calculate(DowPivot dowPivot);
         /// <summary>
         /// This method tells you which trend leg is in formation at the moment.

@@ -75,8 +75,9 @@ namespace NinjaTrader.NinjaScript.Indicators
                 pivotLogic = new PivotLogic(this);
 
                 // Toda vez que a tecla F5 for pressionada automaticamente passara pelo metodo
-                // ClearOutputWindow() e limpara a janela Output das saidas anteriores.
-                ClearOutputWindow();
+                // NinjaTrader.Code.Output.Reset() e limpara todas as abas da janela Output das saidas anteriores.
+                NinjaTrader.Code.Output.Reset(PrintTo.OutputTab1);
+                NinjaTrader.Code.Output.Reset(PrintTo.OutputTab2);
             }
         }
 
