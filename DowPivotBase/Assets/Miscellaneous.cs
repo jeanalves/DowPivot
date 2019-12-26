@@ -1,5 +1,9 @@
-﻿using NinjaTrader.NinjaScript.DrawingTools;
+﻿using NinjaTrader.NinjaScript;
+using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Indicators;
+using System;
+using System.Collections;
+using System.Linq.Expressions;
 using System.Windows.Media;
 
 namespace NinjaTrader.Custom.Indicators.DowPivotBase
@@ -31,6 +35,34 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         public static void PrintError(DowPivot dowPivot, string text)
         {
             Draw.TextFixed(dowPivot, "Error debug", text, TextPosition.BottomRight);
+        }
+
+        public static void PrintTab2(object text)
+        {
+            NinjaTrader.Code.Output.Process(text.ToString(), PrintTo.OutputTab2);
+        }
+
+        public static void PrintStatusOfObjects(ArrayList arrayList)
+        {
+            string text = "";
+
+            for(int i = 0; i < arrayList.Count; i++)
+            {
+                text += GetMemberName(() => arrayList[i]) + "    " + arrayList[i];
+            }
+
+            PrintTab2(text);
+        }
+
+        public static string GetMemberName<T>(Expression<Func<T>> memberExpression)
+        {
+            if (memberExpression is MemberExpression)
+            {
+                MemberExpression expressionBody = (MemberExpression)memberExpression.Body;
+                return expressionBody.Member.Name;
+            }
+
+            return null;
         }
     }
 }
