@@ -1,5 +1,5 @@
+using NinjaTrader.NinjaScript;
 using NinjaTrader.NinjaScript.Indicators;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace NinjaTrader.Custom.Indicators.DowPivotBase
@@ -8,8 +8,6 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
     {
         #region Fields
         private readonly int strength;
-        private readonly ArrayList lastLowCache;
-        private readonly ArrayList lastHighCache;
         private List<HighLowAndIndex> initLowCache = new List<HighLowAndIndex>();
         private List<HighLowAndIndex> initHighCache = new List<HighLowAndIndex>();
         private double lastLow;
@@ -22,20 +20,30 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         public SwingForwardCalculation(DowPivot dowPivot) : base(dowPivot)
         {
             strength = (int)dowPivot.Strength;
-
-            lastLowCache = new ArrayList();
-            lastHighCache = new ArrayList();
-
             lastTrend = TrendDir.Unknown;
         }
 
         public override void Calculate(DowPivot dowPivot)
         {
+            ISeries<double> lows;
+            ISeries<double> highs;
+
+            if(dowPivot.UseHighLow)
+            {
+                lows = dowPivot.Low;
+                highs = dowPivot.High;
+            }
+            else
+            {
+                lows = dowPivot.Close;
+                highs = dowPivot.Close;
+            }
+
             // Este laço faz o calculo das primeiras barras do gráfico
             if(dowPivot.IsFirstTickOfBar && GetHigh(0) == null && GetLow(0) == null)
             {
-                initLowCache.Add(new HighLowAndIndex(dowPivot.Low[barsAgoConstant], dowPivot.CurrentBar - barsAgoConstant));
-                initHighCache.Add(new HighLowAndIndex(dowPivot.High[barsAgoConstant], dowPivot.CurrentBar - barsAgoConstant));
+                initLowCache.Add(new HighLowAndIndex(lows[barsAgoConstant], dowPivot.CurrentBar - barsAgoConstant));
+                initHighCache.Add(new HighLowAndIndex(highs[barsAgoConstant], dowPivot.CurrentBar - barsAgoConstant));
 
                 HighLowAndIndex lowCandidate = initLowCache[0];
                 HighLowAndIndex highCandidate = initHighCache[0];
@@ -60,13 +68,13 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                     {
                         AddLow(dowPivot, lowCandidate.Price, lowCandidate.Index);
                         lastTrend = TrendDir.Down;
-                        calculationEstate = CalculationEstate.SecondValue;
+                        calculationEstate = CalculationEstate.HistoricalRealTime;
                     }
                     else if (lowCandidate.Index > highCandidate.Index)
                     {
                         AddHigh(dowPivot, highCandidate.Price, highCandidate.Index);
                         lastTrend = TrendDir.Up;
-                        calculationEstate = CalculationEstate.SecondValue;
+                        calculationEstate = CalculationEstate.HistoricalRealTime;
                     }
                     else
                     {
@@ -76,16 +84,16 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                 }
                 
             }
-            else if(dowPivot.IsFirstTickOfBar && calculationEstate == CalculationEstate.SecondValue)
+            else if(dowPivot.IsFirstTickOfBar && calculationEstate == CalculationEstate.HistoricalRealTime)
             {
-                bool isSwingLow = dowPivot.Low[0] < dowPivot.Low[1];
-                bool isSwingHigh = dowPivot.High[0] > dowPivot.High[1];
+                bool isSwingLow = lows[barsAgoConstant] < lows[1 + barsAgoConstant];
+                bool isSwingHigh = highs[barsAgoConstant] > highs[1 + barsAgoConstant];
 
                 if(isSwingLow)
                 {
                     for(int i = 1; i < strength + 1; i++)
                     {
-                        if(dowPivot.Low[0] >= dowPivot.Low[i])
+                        if(lows[barsAgoConstant] > lows[i + barsAgoConstant])
                         {
                             isSwingLow = false;
                             break;
@@ -97,7 +105,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                 {
                     for(int i = 1; i < strength+1; i++)
                     {
-                        if(dowPivot.High[0] <= dowPivot.High[i])
+                        if(highs[barsAgoConstant] < highs[i + barsAgoConstant])
                         {
                             isSwingHigh = false;
                             break;
@@ -109,28 +117,28 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                 // Add low
                 if (isSwingLow && lastTrend != TrendDir.Down)
                 {
-                    AddLow(dowPivot, dowPivot.Low[0], dowPivot.CurrentBar);
-                    lastLow = dowPivot.Low[0];
+                    AddLow(dowPivot, lows[barsAgoConstant], dowPivot.CurrentBar - barsAgoConstant);
+                    lastLow = lows[barsAgoConstant];
                     lastTrend = TrendDir.Down;
                 }
                 // Add high
                 else if(isSwingHigh && lastTrend != TrendDir.Up)
                 {
-                    AddHigh(dowPivot, dowPivot.High[0], dowPivot.CurrentBar);
-                    lastHigh = dowPivot.High[0];
+                    AddHigh(dowPivot, highs[barsAgoConstant], dowPivot.CurrentBar - barsAgoConstant);
+                    lastHigh = highs[barsAgoConstant];
                     lastTrend = TrendDir.Up;
                 }
                 // Update Low
-                else if(isSwingLow && lastTrend == TrendDir.Down && dowPivot.Low[0] < lastLow)
+                else if(isSwingLow && lastTrend == TrendDir.Down && lows[barsAgoConstant] < lastLow)
                 {
-                    UpdateLow(dowPivot, dowPivot.Low[0], dowPivot.CurrentBar);
-                    lastLow = dowPivot.Low[0];
+                    UpdateLow(dowPivot, lows[barsAgoConstant], dowPivot.CurrentBar - barsAgoConstant);
+                    lastLow = lows[barsAgoConstant];
                 }
                 // Update High
-                else if(isSwingHigh && lastTrend == TrendDir.Up && dowPivot.High[0] > lastHigh)
+                else if(isSwingHigh && lastTrend == TrendDir.Up && highs[barsAgoConstant] > lastHigh)
                 {
-                    UpdateHigh(dowPivot, dowPivot.High[0], dowPivot.CurrentBar);
-                    lastHigh = dowPivot.High[0];
+                    UpdateHigh(dowPivot, highs[barsAgoConstant], dowPivot.CurrentBar - barsAgoConstant);
+                    lastHigh = highs[barsAgoConstant];
                 }
                 #endregion
             }
@@ -151,7 +159,6 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private enum CalculationEstate
         {
             FirstValue,
-            SecondValue,
             HistoricalRealTime
         }
         public override TrendDir GetCurrentHighLowLeg()
