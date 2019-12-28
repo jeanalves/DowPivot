@@ -1,10 +1,7 @@
 #region Using declarations
-using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.Custom.Indicators.DowPivotBase;
 using NinjaTrader.Gui;
-using NinjaTrader.NinjaScript.DrawingTools;
 using System;
-using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Windows.Media;
@@ -110,7 +107,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                 Print("Current bar: " + CurrentBar);
             }
         }
-        // Test
+
         #region Properties
         [Browsable(false)]
         [XmlIgnore]
@@ -133,8 +130,9 @@ namespace NinjaTrader.NinjaScript.Indicators
             get { return Values[2]; }
         }
 
+        #region Zig Zag parameters
         /************************************** Zig Zag parameters **************************************/
-        //[NinjaScriptProperty]
+        [NinjaScriptProperty]
         [Display(Name = "Calculation type", Order = 0, GroupName = "1 Zig Zag parameters")]
         public ZigZagCalculationType CalculationType
         { get; set; }
@@ -151,71 +149,13 @@ namespace NinjaTrader.NinjaScript.Indicators
         { get; set; }
 
         // Sub menu of draw objects from zigzag
-        //[NinjaScriptProperty]
+        [NinjaScriptProperty]
         [Display(Name = "Draw properties", Order = 5, GroupName = "1 Zig Zag parameters")]
         public DrawProperties DrawProp
         { get; set; }
-        [TypeConverter(typeof(ExpandableObjectConverter))]
-        public class DrawProperties
-        {
-            public override string ToString()
-            {
-                return "";
-            }
+        #endregion
 
-            // First draw propertie
-            [XmlIgnore]
-            [Display(Name = "Show Top Bottom Points", Order = 0, GroupName = "1 Zig Zag parameters")]
-            public bool ShowTopBottomPoints
-            { get; set; }
-            // Serializable from first draw propertie
-            [Browsable(false)]
-            public string ShowTopBottomPointsSerializable
-            {
-                get { return ShowTopBottomPoints.ToString(); }
-                set { ShowTopBottomPoints = Convert.ToBoolean(value); }
-            }
-
-            // Second draw propertie
-            [XmlIgnore]
-            [Display(Name = "Show zig zag", Order = 1, GroupName = "1 Zig Zag parameters")]
-            public bool ShowZigZag
-            { get; set; }
-            // Serializable from second draw propertie
-            [Browsable(false)]
-            public string ShowZigZagSerializable
-            {
-                get { return ShowZigZag.ToString(); }
-                set { ShowZigZag = Convert.ToBoolean(value); }
-            }
-
-            // Third draw propertie
-            [XmlIgnore]
-            [Display(Name = "Zig Zag width", Order = 2, GroupName = "1 Zig Zag parameters")]
-            public int ZigZagWidth
-            { get; set; }
-            // Serializable from third draw propertie
-            [Browsable(false)]
-            public string ZigZagWidthSerializable
-            {
-                get { return ZigZagWidth.ToString(); }
-                set { ZigZagWidth = Convert.ToInt32(value); }
-            }
-
-            // Fourth draw propertie
-            [XmlIgnore]
-            [Display(Name = "Zig zag color", Order = 3, GroupName = "1 Zig Zag parameters")]
-            public Brush ZigZagColor
-            { get; set; }
-            // Serializable from fourth draw propertie
-            [Browsable(false)]
-            public string ZigZagColorSerializable
-            {
-                get { return Serialize.BrushToString(ZigZagColor); }
-                set { ZigZagColor = Serialize.StringToBrush(value); }
-            }
-        }
-
+        #region Pivot parameters
         /**************************************** Pivot parameters ****************************************/
 
         [Display(Name = "Show target and stop", Order = 0, GroupName = "2 Pivot parameters")]
@@ -229,49 +169,115 @@ namespace NinjaTrader.NinjaScript.Indicators
         { get; set; }
 
         // Sub menu of pivot retractions filters
-        //[NinjaScriptProperty]
+        [NinjaScriptProperty]
         [Display(Name = "Fibo Pivot Retraction", Order = 3, GroupName = "2 Pivot parameters")]
         public FiboPivotRetraction FiboPivot
         { get; set; }
-        [TypeConverter(typeof(ExpandableObjectConverter))]
-        public class FiboPivotRetraction
-        {
-            public override string ToString()
-            {
-                return "Max " + MaxPercentOfPivotRetraction + "%, Min " + MinPercentOfPivotRetraction + "%";
-            }
+        #endregion
 
-            // First double text box
-            [XmlIgnore]
-            [Range(0, 100)]
-            [Display(Name = "Max percentage", Order = 0)]
-            public double MaxPercentOfPivotRetraction
-            { get; set; }
-            //Serializable from first box
-            [Browsable(false)]
-            public string MaxPercentOfPivotRetractionSerializable
-            {
-                get { return MaxPercentOfPivotRetraction.ToString(); }
-                set { MaxPercentOfPivotRetraction = Convert.ToDouble(value); }
-            }
-
-            //Second double text box
-            [XmlIgnore]
-            [Range(0, 100)]
-            [Display(Name = "Min percentage", Order = 1)]
-            public double MinPercentOfPivotRetraction
-            { get; set; }
-            //Serializable from second box
-            [Browsable(false)]
-            public string MinPercentOfPivotRetractionSerializable
-            {
-                get { return MinPercentOfPivotRetraction.ToString(); }
-                set { MinPercentOfPivotRetraction = Convert.ToDouble(value); }
-            }
-        }
         #endregion
     }
 }
+
+#region Sub menu's class
+[TypeConverter(typeof(ExpandableObjectConverter))]
+public class DrawProperties
+{
+    public override string ToString()
+    {
+        return "";
+    }
+
+    // First draw propertie
+    [XmlIgnore]
+    [Display(Name = "Show Top Bottom Points", Order = 0, GroupName = "1 Zig Zag parameters")]
+    public bool ShowTopBottomPoints
+    { get; set; }
+    // Serializable from first draw propertie
+    [Browsable(false)]
+    public string ShowTopBottomPointsSerializable
+    {
+        get { return ShowTopBottomPoints.ToString(); }
+        set { ShowTopBottomPoints = Convert.ToBoolean(value); }
+    }
+
+    // Second draw propertie
+    [XmlIgnore]
+    [Display(Name = "Show zig zag", Order = 1, GroupName = "1 Zig Zag parameters")]
+    public bool ShowZigZag
+    { get; set; }
+    // Serializable from second draw propertie
+    [Browsable(false)]
+    public string ShowZigZagSerializable
+    {
+        get { return ShowZigZag.ToString(); }
+        set { ShowZigZag = Convert.ToBoolean(value); }
+    }
+
+    // Third draw propertie
+    [XmlIgnore]
+    [Display(Name = "Zig Zag width", Order = 2, GroupName = "1 Zig Zag parameters")]
+    public int ZigZagWidth
+    { get; set; }
+    // Serializable from third draw propertie
+    [Browsable(false)]
+    public string ZigZagWidthSerializable
+    {
+        get { return ZigZagWidth.ToString(); }
+        set { ZigZagWidth = Convert.ToInt32(value); }
+    }
+
+    // Fourth draw propertie
+    [XmlIgnore]
+    [Display(Name = "Zig zag color", Order = 3, GroupName = "1 Zig Zag parameters")]
+    public Brush ZigZagColor
+    { get; set; }
+    // Serializable from fourth draw propertie
+    [Browsable(false)]
+    public string ZigZagColorSerializable
+    {
+        get { return Serialize.BrushToString(ZigZagColor); }
+        set { ZigZagColor = Serialize.StringToBrush(value); }
+    }
+}
+
+[TypeConverter(typeof(ExpandableObjectConverter))]
+public class FiboPivotRetraction
+{
+    public override string ToString()
+    {
+        return "Max " + MaxPercentOfPivotRetraction + "%, Min " + MinPercentOfPivotRetraction + "%";
+    }
+
+    // First double text box
+    [XmlIgnore]
+    [Range(0, 100)]
+    [Display(Name = "Max percentage", Order = 0)]
+    public double MaxPercentOfPivotRetraction
+    { get; set; }
+    //Serializable from first box
+    [Browsable(false)]
+    public string MaxPercentOfPivotRetractionSerializable
+    {
+        get { return MaxPercentOfPivotRetraction.ToString(); }
+        set { MaxPercentOfPivotRetraction = Convert.ToDouble(value); }
+    }
+
+    //Second double text box
+    [XmlIgnore]
+    [Range(0, 100)]
+    [Display(Name = "Min percentage", Order = 1)]
+    public double MinPercentOfPivotRetraction
+    { get; set; }
+    //Serializable from second box
+    [Browsable(false)]
+    public string MinPercentOfPivotRetractionSerializable
+    {
+        get { return MinPercentOfPivotRetraction.ToString(); }
+        set { MinPercentOfPivotRetraction = Convert.ToDouble(value); }
+    }
+}
+#endregion
 
 #region NinjaScript generated code. Neither change nor remove.
 
@@ -280,18 +286,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private DowPivot[] cacheDowPivot;
-		public DowPivot DowPivot(double strength, bool useHighLow, double percentProfitTargetFibo)
+		public DowPivot DowPivot(ZigZagCalculationType calculationType, double strength, bool useHighLow, DrawProperties drawProp, double percentProfitTargetFibo, FiboPivotRetraction fiboPivot)
 		{
-			return DowPivot(Input, strength, useHighLow, percentProfitTargetFibo);
+			return DowPivot(Input, calculationType, strength, useHighLow, drawProp, percentProfitTargetFibo, fiboPivot);
 		}
 
-		public DowPivot DowPivot(ISeries<double> input, double strength, bool useHighLow, double percentProfitTargetFibo)
+		public DowPivot DowPivot(ISeries<double> input, ZigZagCalculationType calculationType, double strength, bool useHighLow, DrawProperties drawProp, double percentProfitTargetFibo, FiboPivotRetraction fiboPivot)
 		{
 			if (cacheDowPivot != null)
 				for (int idx = 0; idx < cacheDowPivot.Length; idx++)
-					if (cacheDowPivot[idx] != null && cacheDowPivot[idx].Strength == strength && cacheDowPivot[idx].UseHighLow == useHighLow && cacheDowPivot[idx].PercentProfitTargetFibo == percentProfitTargetFibo && cacheDowPivot[idx].EqualsInput(input))
+					if (cacheDowPivot[idx] != null && cacheDowPivot[idx].CalculationType == calculationType && cacheDowPivot[idx].Strength == strength && cacheDowPivot[idx].UseHighLow == useHighLow && cacheDowPivot[idx].DrawProp == drawProp && cacheDowPivot[idx].PercentProfitTargetFibo == percentProfitTargetFibo && cacheDowPivot[idx].FiboPivot == fiboPivot && cacheDowPivot[idx].EqualsInput(input))
 						return cacheDowPivot[idx];
-			return CacheIndicator<DowPivot>(new DowPivot(){ Strength = strength, UseHighLow = useHighLow, PercentProfitTargetFibo = percentProfitTargetFibo }, input, ref cacheDowPivot);
+			return CacheIndicator<DowPivot>(new DowPivot(){ CalculationType = calculationType, Strength = strength, UseHighLow = useHighLow, DrawProp = drawProp, PercentProfitTargetFibo = percentProfitTargetFibo, FiboPivot = fiboPivot }, input, ref cacheDowPivot);
 		}
 	}
 }
@@ -300,14 +306,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.DowPivot DowPivot(double strength, bool useHighLow, double percentProfitTargetFibo)
+		public Indicators.DowPivot DowPivot(ZigZagCalculationType calculationType, double strength, bool useHighLow, DrawProperties drawProp, double percentProfitTargetFibo, FiboPivotRetraction fiboPivot)
 		{
-			return indicator.DowPivot(Input, strength, useHighLow, percentProfitTargetFibo);
+			return indicator.DowPivot(Input, calculationType, strength, useHighLow, drawProp, percentProfitTargetFibo, fiboPivot);
 		}
 
-		public Indicators.DowPivot DowPivot(ISeries<double> input , double strength, bool useHighLow, double percentProfitTargetFibo)
+		public Indicators.DowPivot DowPivot(ISeries<double> input , ZigZagCalculationType calculationType, double strength, bool useHighLow, DrawProperties drawProp, double percentProfitTargetFibo, FiboPivotRetraction fiboPivot)
 		{
-			return indicator.DowPivot(input, strength, useHighLow, percentProfitTargetFibo);
+			return indicator.DowPivot(input, calculationType, strength, useHighLow, drawProp, percentProfitTargetFibo, fiboPivot);
 		}
 	}
 }
@@ -316,14 +322,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.DowPivot DowPivot(double strength, bool useHighLow, double percentProfitTargetFibo)
+		public Indicators.DowPivot DowPivot(ZigZagCalculationType calculationType, double strength, bool useHighLow, DrawProperties drawProp, double percentProfitTargetFibo, FiboPivotRetraction fiboPivot)
 		{
-			return indicator.DowPivot(Input, strength, useHighLow, percentProfitTargetFibo);
+			return indicator.DowPivot(Input, calculationType, strength, useHighLow, drawProp, percentProfitTargetFibo, fiboPivot);
 		}
 
-		public Indicators.DowPivot DowPivot(ISeries<double> input , double strength, bool useHighLow, double percentProfitTargetFibo)
+		public Indicators.DowPivot DowPivot(ISeries<double> input , ZigZagCalculationType calculationType, double strength, bool useHighLow, DrawProperties drawProp, double percentProfitTargetFibo, FiboPivotRetraction fiboPivot)
 		{
-			return indicator.DowPivot(input, strength, useHighLow, percentProfitTargetFibo);
+			return indicator.DowPivot(input, calculationType, strength, useHighLow, drawProp, percentProfitTargetFibo, fiboPivot);
 		}
 	}
 }
