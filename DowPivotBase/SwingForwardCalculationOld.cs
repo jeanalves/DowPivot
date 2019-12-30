@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace NinjaTrader.Custom.Indicators.DowPivotBase
 {
-    public class SwingForwardCalculation : ZigZag
+    public class SwingForwardCalculationOld : ZigZag
     {
         #region Fields
         private readonly int strength;
@@ -19,7 +19,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private const int barsAgoConstant = 1;
         #endregion
 
-        public SwingForwardCalculation(DowPivot dowPivot) : base(dowPivot)
+        public SwingForwardCalculationOld(DowPivot dowPivot) : base(dowPivot)
         {
             strength = (int)dowPivot.Strength;
 
@@ -31,8 +31,9 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
 
         public override void Calculate(DowPivot dowPivot)
         {
+            #region Calcula primeiro ponto
             // Este laço faz o calculo das primeiras barras do gráfico
-            if(dowPivot.IsFirstTickOfBar && GetHigh(0) == null && GetLow(0) == null)
+            if (dowPivot.IsFirstTickOfBar && GetHigh(0) == null && GetLow(0) == null)
             {
                 initLowCache.Add(new HighLowAndIndex(dowPivot.Low[barsAgoConstant], dowPivot.CurrentBar - barsAgoConstant));
                 initHighCache.Add(new HighLowAndIndex(dowPivot.High[barsAgoConstant], dowPivot.CurrentBar - barsAgoConstant));
@@ -72,16 +73,13 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                     {
                         Miscellaneous.PrintError(dowPivot, "In the initial calculation of the 'Low' and 'High', they have the same index," +
                             " Low index: " + lowCandidate.Index + "    High index: " + highCandidate.Index);
-                        dowPivot.Print("Erro");
-                        dowPivot.Print("Erro");
-                        dowPivot.Print("Erro");
-                        dowPivot.Print("Erro");
-                        dowPivot.Print("Erro");
-                        dowPivot.Print("Erro");
                     }
                 }
-                
+
             }
+            #endregion
+
+            #region Calcula dados históricos e de tempo real
             // Enter only once per bar
             else if (dowPivot.IsFirstTickOfBar && (calculationEstate == CalculationEstate.SecondValue || calculationEstate == CalculationEstate.HistoricalRealTime))
             {
@@ -158,6 +156,9 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                     lastHigh = dowPivot.High[barsAgoConstant];
                 }
             }
+            #endregion
+
+            #region Calcula todos os ticks em tempo real
             // Este "if" � executado apenas quando lastTrend � iniciada alterando de "Unknow"
             // para "Up" ou "Down" e em todos os ticks com exce��o do primeiro tick
             else if (!dowPivot.IsFirstTickOfBar && GetLow(0) != null && GetHigh(0) != null &&
@@ -175,6 +176,8 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                     UpdateHigh(dowPivot, dowPivot.High[0], dowPivot.CurrentBar);
                 }
             }
+            #endregion
+
         }
 
         private struct HighLowAndIndex

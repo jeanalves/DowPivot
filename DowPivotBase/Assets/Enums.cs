@@ -17,6 +17,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
     {
         Points,
         SwingDelayed,
-        SwingForward
+        SwingForwardOld,
+        SwingForwardNew
     }
 }
