@@ -186,6 +186,15 @@ namespace NinjaTrader.NinjaScript.Indicators
 }
 
 #region Sub menu's class
+
+public enum ZigZagCalculationType
+{
+    Points,
+    SwingDelayed,
+    SwingForwardOld,
+    SwingForwardNew
+}
+
 [TypeConverter(typeof(ExpandableObjectConverter))]
 public class DrawProperties
 {

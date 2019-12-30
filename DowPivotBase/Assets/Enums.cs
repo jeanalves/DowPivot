@@ -13,11 +13,4 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         Down,
         Unknown
     };
-    public enum ZigZagCalculationType
-    {
-        Points,
-        SwingDelayed,
-        SwingForwardOld,
-        SwingForwardNew
-    }
 }

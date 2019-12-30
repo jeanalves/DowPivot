@@ -180,6 +180,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
 
         }
 
+        // Substituir este Struct por System.Windows.Point
         private struct HighLowAndIndex
         {
             public double Price;
