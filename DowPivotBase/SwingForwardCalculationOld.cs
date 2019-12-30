@@ -31,6 +31,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
 
         public override void Calculate(DowPivot dowPivot)
         {
+            #region Calcula primeiro ponto
             // Este laço faz o calculo das primeiras barras do gráfico
             if (dowPivot.IsFirstTickOfBar && GetHigh(0) == null && GetLow(0) == null)
             {
@@ -76,6 +77,9 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                 }
 
             }
+            #endregion
+
+            #region Calcula dados históricos e de tempo real
             // Enter only once per bar
             else if (dowPivot.IsFirstTickOfBar && (calculationEstate == CalculationEstate.SecondValue || calculationEstate == CalculationEstate.HistoricalRealTime))
             {
@@ -152,6 +156,9 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                     lastHigh = dowPivot.High[barsAgoConstant];
                 }
             }
+            #endregion
+
+            #region Calcula todos os ticks em tempo real
             // Este "if" � executado apenas quando lastTrend � iniciada alterando de "Unknow"
             // para "Up" ou "Down" e em todos os ticks com exce��o do primeiro tick
             else if (!dowPivot.IsFirstTickOfBar && GetLow(0) != null && GetHigh(0) != null &&
@@ -169,6 +176,8 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                     UpdateHigh(dowPivot, dowPivot.High[0], dowPivot.CurrentBar);
                 }
             }
+            #endregion
+
         }
 
         private struct HighLowAndIndex
