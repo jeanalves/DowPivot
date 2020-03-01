@@ -17,13 +17,13 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private bool isOverHighPipDiff;
         #endregion
 
-        public PointsCalculation(DowPivot dowPivot) : base(dowPivot)
+        public PointsCalculation(DowPivotOld dowPivot) : base(dowPivot)
         {
             isFirstLowValue = true;
             isFirstHighValue = true;
         }
 
-        public override void Calculate(DowPivot dowPivot)
+        public override void Calculate(DowPivotOld dowPivot)
         {
             //Calculation
             isFalling = GetCloseOrHighLow(dowPivot, TrendDir.Down, 0) < GetCloseOrHighLow(dowPivot, TrendDir.Down, 0 + 1);
@@ -74,7 +74,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             else
                 return TrendDir.Down;
         }
-        private double GetCloseOrHighLow(DowPivot _dp, TrendDir trendDir, int _barsAgo)
+        private double GetCloseOrHighLow(DowPivotOld _dp, TrendDir trendDir, int _barsAgo)
         {
             if (trendDir == TrendDir.Down)
             {

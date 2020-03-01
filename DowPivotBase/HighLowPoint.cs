@@ -25,7 +25,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             trendDir = TrendDir.Unknown;
         }
 
-        public HighLowPoint(DowPivot dowPivot, double price, int barIndex, int pointIndex, TrendDir trendDir)
+        public HighLowPoint(DowPivotOld dowPivot, double price, int barIndex, int pointIndex, TrendDir trendDir)
         {
             this.Price = price;
             this.BarIndex = barIndex;
@@ -35,13 +35,13 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         }
         #endregion
 
-        public void Update(DowPivot dowPivot, double price, int barIndex)
+        public void Update(DowPivotOld dowPivot, double price, int barIndex)
         {
             Price = price;
             BarIndex = barIndex;
             PrintPoint(dowPivot);
         }
-        private void PrintPoint(DowPivot dowPivot)
+        private void PrintPoint(DowPivotOld dowPivot)
         {
             if (!dowPivot.DrawProp.ShowTopBottomPoints)
                 return;

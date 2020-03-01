@@ -9,12 +9,12 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
     {
         private readonly List<HighLowPoint> lows;
         private readonly List<HighLowPoint> highs;
-        private readonly DowPivot dowPivot;
+        private readonly DowPivotOld dowPivot;
         private string lowTagName;
         private string highTagName;
         public int PointCount { get; private set; }
 
-        protected ZigZag(DowPivot dowPivot)
+        protected ZigZag(DowPivotOld dowPivot)
         {
             lows = new List<HighLowPoint>();
             highs = new List<HighLowPoint>();
@@ -45,31 +45,31 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         #endregion
 
         #region SETs
-        protected void AddLow(DowPivot dowPivot, double price, int barIndex)
+        protected void AddLow(DowPivotOld dowPivot, double price, int barIndex)
         {
             lows.Add(new HighLowPoint(dowPivot, price, barIndex, PointCount, TrendDir.Down));
             PrintZigZagLines(dowPivot, Situation.AddLow);
             PointCount++;
         }
-        protected void AddHigh(DowPivot dowPivot, double price, int barIndex)
+        protected void AddHigh(DowPivotOld dowPivot, double price, int barIndex)
         {
             highs.Add(new HighLowPoint(dowPivot, price, barIndex, PointCount, TrendDir.Up));
             PrintZigZagLines(dowPivot, Situation.AddHigh);
             PointCount++;
         }
-        protected void UpdateLow(DowPivot dowPivot, double price, int barIndex)
+        protected void UpdateLow(DowPivotOld dowPivot, double price, int barIndex)
         {
             lows[lows.Count - 1].Update(dowPivot, price, barIndex);
             PrintZigZagLines(dowPivot, Situation.UpdateLow);
         }
-        protected void UpdateHigh(DowPivot dowPivot, double price, int barIndex)
+        protected void UpdateHigh(DowPivotOld dowPivot, double price, int barIndex)
         {
             highs[highs.Count - 1].Update(dowPivot, price, barIndex);
             PrintZigZagLines(dowPivot, Situation.UpdateHigh);
         }
         #endregion
 
-        private void PrintZigZagLines(DowPivot dowPivot, Situation situation)
+        private void PrintZigZagLines(DowPivotOld dowPivot, Situation situation)
         {
             if (lows.Count != 0 && highs.Count != 0 && dowPivot.DrawProp.ShowZigZag)
             {
@@ -110,7 +110,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         /// Used to create the magic
         /// </summary>
         /// <param name="dowPivot"></param>
-        public abstract void Calculate(DowPivot dowPivot);
+        public abstract void Calculate(DowPivotOld dowPivot);
         /// <summary>
         /// This method tells you which trend leg is in formation at the moment.
         /// </summary>
@@ -120,7 +120,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
     }
     public interface IZigZagBasicFunctions
     {
-        void Calculate(DowPivot dowPivot);
+        void Calculate(DowPivotOld dowPivot);
         TrendDir GetCurrentHighLowLeg();
     }
 }

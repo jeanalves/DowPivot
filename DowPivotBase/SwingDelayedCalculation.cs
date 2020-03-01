@@ -21,7 +21,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private const int barsAgoConstant = 1;
         #endregion
 
-        public SwingDelayedCalculation(DowPivot dowPivot) : base(dowPivot)
+        public SwingDelayedCalculation(DowPivotOld dowPivot) : base(dowPivot)
         {
             strength = (int)dowPivot.Strength;
             constant = (strength * 2) + 1;
@@ -32,7 +32,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             lastTrend = TrendDir.Unknown;
         }
 
-        public override void Calculate(DowPivot dowPivot)
+        public override void Calculate(DowPivotOld dowPivot)
         {
             // Enter only once per bar
             if (dowPivot.IsFirstTickOfBar)

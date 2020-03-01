@@ -19,7 +19,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private const int barsAgoConstant = 1;
         #endregion
 
-        public SwingForwardCalculationOld(DowPivot dowPivot) : base(dowPivot)
+        public SwingForwardCalculationOld(DowPivotOld dowPivot) : base(dowPivot)
         {
             strength = (int)dowPivot.Strength;
 
@@ -29,7 +29,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             lastTrend = TrendDir.Unknown;
         }
 
-        public override void Calculate(DowPivot dowPivot)
+        public override void Calculate(DowPivotOld dowPivot)
         {
             #region Calcula primeiro ponto
             // Este laço faz o calculo das primeiras barras do gráfico

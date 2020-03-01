@@ -32,14 +32,14 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private TrendDir lastTrend = TrendDir.Unknown;
         #endregion
 
-        public PivotLogic(DowPivot dowPivot)
+        public PivotLogic(DowPivotOld dowPivot)
         {
             SetStopLossPrice(dowPivot, dowPivot.Input[0]);                // Initiate
             SetProfitTargetPrice(dowPivot, currentPP, TrendDir.Unknown);  // Initiate
             SetPlotBuyOrSell(dowPivot, TrendDir.Unknown);                 // Set signal to 0 before a entry
         }
 
-        public void Calculate(DowPivot dowPivot, ZigZag dowPivotZigZag)
+        public void Calculate(DowPivotOld dowPivot, ZigZag dowPivotZigZag)
         {
             if (dowPivotZigZag.GetLow(1).Price == 0 ||
                 dowPivotZigZag.GetLow(0).Price == 0 ||
@@ -137,7 +137,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         }
 
         #region Methods
-        private void PrintPivots(DowPivot dowPivot, Situation state)
+        private void PrintPivots(DowPivotOld dowPivot, Situation state)
         {
             line1 = "Line 1 " + dowPivot.CurrentBar;
             line2 = "Line 2 " + dowPivot.CurrentBar;
@@ -172,7 +172,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                     break;
             }
         }
-        private bool IsOverMaxPercentPivotRetracement(DowPivot dowPivot, TrendDir trendDir, PivotPoint pp)
+        private bool IsOverMaxPercentPivotRetracement(DowPivotOld dowPivot, TrendDir trendDir, PivotPoint pp)
         {
             switch (trendDir)
             {
@@ -204,7 +204,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             }
             return false;
         }
-        private bool IsOverMinPercentPivotRetracement(DowPivot dowPivot, TrendDir trendDir, PivotPoint pp)
+        private bool IsOverMinPercentPivotRetracement(DowPivotOld dowPivot, TrendDir trendDir, PivotPoint pp)
         {
             switch (trendDir)
             {
@@ -237,7 +237,7 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
             }
             return false;
         }
-        private void SetPlotBuyOrSell(DowPivot dowPivot, TrendDir trendDir)
+        private void SetPlotBuyOrSell(DowPivotOld dowPivot, TrendDir trendDir)
         {
             switch (trendDir)
             {
@@ -252,11 +252,11 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
                     break;
             }
         }
-        private void SetStopLossPrice(DowPivot dowPivot, double price)
+        private void SetStopLossPrice(DowPivotOld dowPivot, double price)
         {
             dowPivot.StopLossPriceSignal[0] = price;
         }
-        private void SetProfitTargetPrice(DowPivot dowPivot, PivotPoint pp, TrendDir trendDir)
+        private void SetProfitTargetPrice(DowPivotOld dowPivot, PivotPoint pp, TrendDir trendDir)
         {
             if (dowPivot.ShowTargetAndStop)
             {

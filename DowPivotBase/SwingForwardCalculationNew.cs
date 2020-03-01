@@ -17,13 +17,13 @@ namespace NinjaTrader.Custom.Indicators.DowPivotBase
         private const int barsAgoConstant = 1;
         #endregion
 
-        public SwingForwardCalculationNew(DowPivot dowPivot) : base(dowPivot)
+        public SwingForwardCalculationNew(DowPivotOld dowPivot) : base(dowPivot)
         {
             strength = (int)dowPivot.Strength;
             lastTrend = TrendDir.Unknown;
         }
 
-        public override void Calculate(DowPivot dowPivot)
+        public override void Calculate(DowPivotOld dowPivot)
         {
             ISeries<double> lows;
             ISeries<double> highs;
